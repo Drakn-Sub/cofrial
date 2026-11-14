@@ -52,9 +52,17 @@ pip install -r requirements.txt
 export SECRET_KEY=solo-desarrollo DEBUG=1 DB_USER=cofrial_migrate DB_PASSWORD=...
 python manage.py migrate
 export DB_USER=cofrial_app DB_PASSWORD=...
-python manage.py cargar_demo
+python manage.py cargar_demo        # catálogo con imágenes, clientes, CRM y 50 camiones
+python manage.py generar_actividad  # ~2 meses de pedidos, despachos, alertas e interacciones
 python manage.py runserver
 ```
+
+## Créditos
+
+Las imágenes de producto de la tienda de demostración (`app/cuentas/demo/imagenes`) se
+generan con `app/cuentas/demo/generar_imagenes.py` a partir de los íconos
+[Twemoji](https://github.com/jdecked/twemoji) (© Twitter/X y colaboradores, licencia CC-BY 4.0).
+Todos los clientes, RUT y personas de los datos de demostración son ficticios.
 
 ## Uso de herramientas de IA
 
