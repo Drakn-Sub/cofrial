@@ -36,6 +36,10 @@ CASOS = [
     ("iot_ingest", "PW_IOT", "SELECT * FROM comercial.auth_user", False, "IoT NO lee usuarios ni contraseñas"),
     ("bi_reader", "PW_BI", "SELECT * FROM comercial.auth_user", False, "Metabase NO lee usuarios"),
     ("bi_reader", "PW_BI", "SELECT * FROM comercial.cuentas_cliente", False, "Metabase NO lee datos personales"),
+    ("bi_reader", "PW_BI", "SELECT * FROM comercial.order_order", False, "Metabase NO lee pedidos con detalle"),
+    ("bi_reader", "PW_BI", "SELECT * FROM bi.v_ventas_por_canal", True, "Metabase lee ventas agregadas"),
+    ("bi_reader", "PW_BI", "SELECT * FROM bi.v_ultima_posicion", True, "Metabase lee la posición de la flota"),
+    ("bi_reader", "PW_BI", "CREATE VIEW bi.intrusa AS SELECT 1", False, "Metabase NO crea objetos"),
 ]
 
 
