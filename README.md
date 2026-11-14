@@ -7,6 +7,12 @@ Plataforma única para una distribuidora de alimentos refrigerados de La Araucan
 tienda B2B/B2C, CRM, torre de control con telemetría IoT y tablero de BI, desplegada
 en AWS con un enfoque de seguridad desde el diseño (DevSecOps).
 
+## Documentación
+
+- [Auditoría inicial de la infraestructura](docs/01-auditoria-inicial.md)
+- [Evidencias del Hito 2](docs/02-evidencias-hito2.md): 29/29 pruebas de seguridad y 20/20 de privilegios
+- [Guion de la demo](docs/03-guion-demo.md)
+
 ## Componentes
 
 | Carpeta | Qué contiene |
