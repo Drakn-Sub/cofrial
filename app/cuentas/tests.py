@@ -2,6 +2,7 @@ from datetime import date
 from decimal import Decimal
 
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group, Permission
 from django.test import Client, TestCase, override_settings
 from oscar.core.loading import get_class, get_model
 
@@ -81,8 +82,9 @@ class CanalesPorHostTests(TestCase):
             self.assertEqual(self.client.get(ruta, HTTP_HOST="tienda.cofrial.test").status_code, 404, ruta)
 
     def test_cada_host_abre_su_canal(self):
-        self.assertRedirects(self.client.get("/", HTTP_HOST="crm.cofrial.test"), "/crm/", fetch_redirect_response=False)
-        self.assertRedirects(self.client.get("/", HTTP_HOST="ops.cofrial.test"), "/ops/", fetch_redirect_response=False)
+        for host in ["crm.cofrial.test", "ops.cofrial.test"]:
+            self.assertRedirects(self.client.get("/", HTTP_HOST=host), "/ingresar/", fetch_redirect_response=False)
+        self.assertEqual(self.client.get("/ingresar/", HTTP_HOST="tienda.cofrial.test").status_code, 404)
 
 
 @override_settings(REQUIERE_2FA=True)
@@ -121,3 +123,65 @@ class CatalogoTests(TestCase):
         respuesta = self.client.get("/catalogue/")
         self.assertEqual(respuesta.status_code, 200)
         self.assertContains(respuesta, "Posta negra 1 kg")
+
+
+@override_settings(REQUIERE_2FA=False)
+class SeparacionDeRolesTests(TestCase):
+    """Cada rol abre solo sus secciones; el menú y la pantalla de inicio salen de la misma tabla."""
+
+    def _persona(self, correo, grupo, apps, extra=()):
+        usuario = User.objects.create_user(correo, correo, "Clave-larga-123!", is_staff=True)
+        g = Group.objects.create(name=grupo)
+        g.permissions.set(Permission.objects.filter(content_type__app_label__in=apps))
+        for app, codigo in extra:
+            g.permissions.add(Permission.objects.get(content_type__app_label=app, codename=codigo))
+        usuario.groups.add(g)
+        return usuario
+
+    def setUp(self):
+        self.vendedora = self._persona("v@cofrial.cl", "Vendedores", ["crm"])
+        self.despacho = self._persona("d@cofrial.cl", "Despacho", ["logistica"], [("order", "view_order")])
+
+    def test_sin_sesion_va_al_ingreso_de_la_intranet(self):
+        for ruta in ["/crm/", "/ops/", "/dashboard/", "/admin/"]:
+            respuesta = self.client.get(ruta)
+            self.assertEqual(respuesta.status_code, 302, ruta)
+            self.assertTrue(respuesta["Location"].startswith("/ingresar/"), ruta)
+
+    def test_cada_rol_llega_a_su_pantalla_al_ingresar(self):
+        for correo, inicio in [("v@cofrial.cl", "/crm/"), ("d@cofrial.cl", "/ops/")]:
+            respuesta = self.client.post("/ingresar/", {"username": correo, "password": "Clave-larga-123!"})
+            self.assertRedirects(respuesta, inicio, fetch_redirect_response=False)
+            self.client.logout()
+
+    def test_vendedora_no_abre_torre_ni_pedidos(self):
+        self.client.force_login(self.vendedora)
+        self.assertEqual(self.client.get("/crm/").status_code, 200)
+        for ruta in ["/ops/", "/dashboard/"]:
+            self.assertRedirects(self.client.get(ruta), "/crm/", fetch_redirect_response=False)
+        self.assertEqual(self.client.post("/ops/alerta/1/tomar/", {"accion_tomada": "x"}).status_code, 403)
+        self.assertTrue(AuditoriaEvento.objects.filter(accion="ACCESO_DENEGADO").exists())
+
+    def test_despacho_no_abre_el_crm(self):
+        self.client.force_login(self.despacho)
+        self.assertEqual(self.client.get("/ops/").status_code, 200)
+        self.assertRedirects(self.client.get("/crm/"), "/ops/", fetch_redirect_response=False)
+
+    def test_el_menu_muestra_solo_lo_permitido(self):
+        self.client.force_login(self.vendedora)
+        html = self.client.get("/crm/").content.decode()
+        self.assertIn("Ventas (CRM)", html)
+        self.assertNotIn("Torre de control", html)
+        self.assertNotIn(">Administración<", html)
+
+    def test_cliente_de_la_tienda_no_ve_la_intranet(self):
+        cliente = User.objects.create_user("c@demo.cl", "c@demo.cl", "Clave-larga-123!")
+        self.client.force_login(cliente)
+        self.assertEqual(self.client.get("/crm/").status_code, 404)
+
+    def test_administracion_sin_tablas_tecnicas_de_la_tienda(self):
+        jefe = User.objects.create_superuser("admin", "a@cofrial.cl", "Clave-larga-123!")
+        self.client.force_login(jefe)
+        html = self.client.get("/admin/").content.decode()
+        self.assertIn("Eventos de auditoría", html)
+        self.assertNotIn("/admin/basket/", html)

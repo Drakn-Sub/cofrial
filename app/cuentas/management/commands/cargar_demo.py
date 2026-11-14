@@ -129,7 +129,7 @@ class Command(BaseCommand):
 
         vendedores = self._grupo("Vendedores", ["crm"], ["cuentas.view_cliente", "cuentas.view_comuna"])
         despacho = self._grupo("Despacho", ["logistica"], ["order.view_order", "order.change_order"])
-        jefatura = self._grupo("Jefatura comercial", ["crm", "cuentas"], [])
+        jefatura = self._grupo("Jefatura comercial", ["crm", "cuentas"], ["order.view_order"])
 
         comprador = usuario("compras@hospital-demo.cl", "Compras Hospital")
         Perfil.objects.update_or_create(usuario=comprador, defaults={"cliente": hospital, "cargo": "Jefa de abastecimiento"})
