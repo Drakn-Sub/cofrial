@@ -14,6 +14,10 @@
    ```bash
    bash ~/cofrial/infra/scripts/pruebas_seguridad.sh   # debe decir 29 pasan
    ```
+   **Importante:** al iniciar el laboratorio, AWS Academy enciende también los dos servidores viejos de la auditoría. Si la prueba "Servidores inseguros de la auditoría detenidos" falla, detenerlos:
+   ```bash
+   aws ec2 stop-instances --instance-ids $(aws ec2 describe-instances --filters Name=tag:Estado,Values=reemplazado-auditoria-H2-H3 --query 'Reservations[].Instances[].InstanceId' --output text)
+   ```
 3. Abrir estas pestañas en este orden y **dejar las sesiones iniciadas**, para que el 2FA no se coma tiempo:
    1. Tienda, **sin sesión**: https://tienda.cofrial-temuco.duckdns.org
    2. Tienda en ventana de incógnito, con sesión de `compras@hospital-demo.cl`.
