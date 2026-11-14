@@ -111,3 +111,13 @@ class AuditoriaTests(TestCase):
 
     def test_salud_verifica_la_base_de_datos(self):
         self.assertEqual(self.client.get("/salud/").json(), {"estado": "ok"})
+
+
+class CatalogoTests(TestCase):
+    """El listado del catálogo lee desde PostgreSQL (no depende de un índice de búsqueda)."""
+
+    def test_catalogo_muestra_productos_publicos(self):
+        crear_producto()
+        respuesta = self.client.get("/catalogue/")
+        self.assertEqual(respuesta.status_code, 200)
+        self.assertContains(respuesta, "Posta negra 1 kg")
