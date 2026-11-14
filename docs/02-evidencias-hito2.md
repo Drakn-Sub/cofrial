@@ -27,16 +27,16 @@ Las contraseñas no están en este documento ni en el repositorio.
 ### Arquitectura desplegada
 
 ```
-Internet ──> NLB (2 IP elásticas, 1a y 1b) ──> ALB interno (TLS, certificado ACM *.cofrial-temuco.duckdns.org)
-                                                  │  reglas por nombre: tienda / crm / ops / bi
-                         ┌────────────────────────┴────────────────────────┐
-              cofrial-app-a (10.20.11.0/24, us-east-1a)        cofrial-app-b (10.20.12.0/24, us-east-1b)
-              Nginx + Django/Gunicorn + Metabase (Docker)      Nginx + Django/Gunicorn + Metabase (Docker)
-                         └────────────────────────┬────────────────────────┘
-                                                  │ 5432 con TLS verify-full
-                         RDS PostgreSQL 16 Multi-AZ (10.20.21.0/24 y 10.20.22.0/24), cifrada
-                                                  ▲
-              cofrial-iot (10.20.31.0/24): simulador de 50 camiones en Docker, rol iot_ingest
+Internet ──> NLB (2 IP elásticas, 1a y 1b) ──> ALB interno (HTTPS, certificado ACM)
+                                                │ reglas: tienda / crm / ops / bi
+                    ┌───────────────────────────┴───────────────────────────┐
+         cofrial-app-a (10.20.11.0/24, 1a)                cofrial-app-b (10.20.12.0/24, 1b)
+         Nginx + Django + Metabase (Docker)               Nginx + Django + Metabase (Docker)
+                    └───────────────────────────┬───────────────────────────┘
+                                                │ 5432 con TLS verify-full
+                          RDS PostgreSQL 16 Multi-AZ, cifrada (10.20.21.0/24 y 10.20.22.0/24)
+                                                ▲
+         cofrial-iot (10.20.31.0/24): 50 camiones simulados en Docker, rol iot_ingest
 ```
 
 | Componente | Configuración | Por qué |
