@@ -185,3 +185,15 @@ class SeparacionDeRolesTests(TestCase):
         html = self.client.get("/admin/").content.decode()
         self.assertIn("Eventos de auditoría", html)
         self.assertNotIn("/admin/basket/", html)
+
+
+class CambioDeCelularTests(TestCase):
+    def test_sin_verificar_no_se_puede_reiniciar_el_segundo_factor(self):
+        from django_otp.plugins.otp_totp.models import TOTPDevice
+
+        persona = User.objects.create_user("v@cofrial.cl", "v@cofrial.cl", "Clave-larga-123!", is_staff=True)
+        TOTPDevice.objects.create(user=persona, name="celular", confirmed=True)
+        self.client.force_login(persona)  # solo contraseña, sin código del celular
+        respuesta = self.client.post("/cuentas/2fa/otro-celular/")
+        self.assertRedirects(respuesta, "/cuentas/2fa/", fetch_redirect_response=False)
+        self.assertEqual(TOTPDevice.objects.filter(user=persona).count(), 1)

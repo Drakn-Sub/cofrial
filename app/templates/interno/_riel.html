@@ -7,7 +7,8 @@
   {% if user.is_authenticated %}
   <div class="yo">Sesión de<b>{{ user.email|default:user.username }}</b>
     <span class="rol">{{ rol_intranet }}</span>
-    {% if user.is_staff %}<a href="/admin/password_change/">Cambiar contraseña</a>{% endif %}
+    {% if user.is_staff and menu_intranet %}<a href="/admin/password_change/">Cambiar contraseña</a>
+    <a href="/cuentas/2fa/otro-celular/">Vincular otro celular</a>{% endif %}
     <a href="/accounts/logout/">Cerrar sesión</a>
   </div>
   {% endif %}

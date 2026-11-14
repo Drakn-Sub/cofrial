@@ -86,6 +86,26 @@ def segundo_factor(request):
     return render(request, "cuentas/segundo_factor.html", contexto)
 
 
+@never_cache
+@login_required(login_url="/ingresar/")
+def vincular_otro_celular(request):
+    """Cambio de celular: borra el segundo factor actual para escanear un código QR nuevo.
+
+    Solo lo puede hacer la propia persona y solo con la sesión ya verificada con el celular
+    actual; quien robó una contraseña no puede usar esto para saltarse el segundo factor.
+    Si el celular se perdió, lo reinicia el administrador (comando reiniciar_2fa)."""
+    usuario = request.user
+    if not usuario.is_staff:
+        return redirect("/")
+    if not usuario.is_verified():
+        return redirect("/cuentas/2fa/")
+    if request.method == "POST":
+        TOTPDevice.objects.filter(user=usuario).delete()
+        auditar("2FA_REINICIADO", request, entidad="usuario", entidad_id=usuario.pk, detalle="por la propia persona")
+        return redirect("/cuentas/2fa/")
+    return render(request, "cuentas/vincular_otro_celular.html")
+
+
 @require_GET
 @never_cache
 def salud(request):
