@@ -11,5 +11,6 @@ urlpatterns = [
     path("salud/", cuentas_views.salud, name="salud"),
     path("cuentas/2fa/", cuentas_views.segundo_factor, name="segundo_factor"),
     path("admin/", admin.site.urls),
+    path("crm/", include("crm.urls")),
     path("", include(apps.get_app_config("oscar").urls[0])),  # tienda django-oscar
 ]
