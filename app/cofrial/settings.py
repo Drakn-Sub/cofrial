@@ -200,6 +200,12 @@ if os.environ.get("MEDIA_BUCKET"):
             "file_overwrite": False,
         },
     }
+    # sorl-thumbnail (miniaturas de Oscar) instancia la clase de almacenamiento sin OPTIONS:
+    # lee la misma configuración desde estas variables globales de django-storages.
+    AWS_STORAGE_BUCKET_NAME = os.environ["MEDIA_BUCKET"]
+    AWS_S3_REGION_NAME = os.environ.get("AWS_REGION", "us-east-1")
+    AWS_QUERYSTRING_EXPIRE = 3600
+    AWS_S3_FILE_OVERWRITE = False
 
 HAYSTACK_CONNECTIONS = {"default": {"ENGINE": "haystack.backends.simple_backend.SimpleEngine"}}
 
