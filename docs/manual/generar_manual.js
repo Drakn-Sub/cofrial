@@ -91,7 +91,7 @@ contenido.push(
   new Paragraph({ border: { top: { style: BorderStyle.SINGLE, size: 24, color: GLACIAR, space: 1 } }, children: [] }),
   p([b("Equipo: "), t("Benjamín Aguilar y Daniel Jara")]),
   p([b("Asignatura: "), t("Transformación Digital (TIEL15), INACAP Sede Temuco")]),
-  p([b("Versión: "), t("1.0, noviembre de 2026")]),
+  p([b("Versión: "), t("1.1, noviembre de 2026")]),
   p([t("Todos los clientes, personas, RUT y pedidos que aparecen en las imágenes son ficticios.", { italics: true, color: NIEBLA, size: 19 })], { spacing: { before: 600 } }),
   new Paragraph({ children: [new PageBreak()] }),
   new Paragraph({ heading: HeadingLevel.HEADING_1, children: [t("Contenido")] }),
@@ -104,21 +104,23 @@ contenido.push(
   p("Cofrial tiene cinco pantallas principales. Todas leen y escriben en la misma base de datos, por eso lo que pasa en una se ve de inmediato en las otras: un pedido de la tienda aparece en el CRM y en el panel de pedidos, y una falla de frío en un camión cambia el estado de los pedidos que lleva."),
   tabla(["Pantalla", "Dirección", "Quién la usa", "Para qué"], [
     ["Tienda", "tienda.cofrial-temuco.duckdns.org", "Público e instituciones con convenio", "Ver productos, comprar y seguir pedidos"],
-    ["Ventas (CRM)", "crm.cofrial-temuco.duckdns.org", "Vendedores y jefatura comercial", "Seguir oportunidades de venta y reclamos"],
-    ["Torre de control", "ops.cofrial-temuco.duckdns.org", "Despachadores", "Ver la flota en vivo y atender alertas de frío"],
-    ["Pedidos y catálogo", "crm.cofrial-temuco.duckdns.org/dashboard/", "Despacho y administración", "Gestionar pedidos, productos y stock"],
+    ["Intranet: Ventas (CRM)", "crm.cofrial-temuco.duckdns.org", "Ventas y jefatura comercial", "Seguir oportunidades de venta y reclamos"],
+    ["Intranet: Torre de control", "ops.cofrial-temuco.duckdns.org", "Despacho", "Ver la flota en vivo y atender alertas de frío"],
+    ["Intranet: Pedidos y catálogo", "Menú de la intranet", "Despacho y jefatura", "Gestionar pedidos, productos y stock"],
+    ["Intranet: Administración", "Menú de la intranet", "Administrador", "Usuarios, clientes, registros y auditoría"],
     ["Dashboard gerencial", "bi.cofrial-temuco.duckdns.org", "Gerencia", "Indicadores de ventas y cadena de frío"],
-    ["Administración", "crm.cofrial-temuco.duckdns.org/admin/", "Administrador", "Usuarios, clientes, interacciones y auditoría"],
   ], [1700, 3000, 2300, 2638]),
-  nota("Por seguridad:", "las pantallas internas no existen en la dirección de la tienda. Si alguien escribe tienda…/admin/ recibe un error 404. Cada canal tiene su propia dirección."),
+  p("Hay tres ingresos distintos: el de la tienda (clientes), el de la intranet (personal) y el de Metabase (gerencia). Las direcciones crm. y ops. llevan a la misma intranet: después de iniciar sesión, cada persona llega a la pantalla de su rol."),
+  nota("Por seguridad:", "las pantallas internas y el ingreso del personal no existen en la dirección de la tienda. Si alguien escribe tienda…/admin/ recibe un error 404."),
   h2("Usuarios de prueba"),
   tabla(["Usuario", "Rol", "Qué puede hacer"], [
     ["compras@hospital-demo.cl", "Cliente con convenio (B2B)", "Comprar en la tienda con los precios de su convenio y ver sus pedidos"],
-    ["vendedor@cofrial.cl", "Vendedora", "Ver y mover solo sus oportunidades en el CRM"],
-    ["despacho@cofrial.cl", "Despachador", "Usar la torre de control y cambiar el estado de los pedidos"],
-    ["benjamin", "Administrador", "Todo, incluida la administración y la auditoría"],
+    ["vendedor@cofrial.cl", "Ventas", "CRM (solo sus oportunidades) y fichas de prospectos y mensajes"],
+    ["despacho@cofrial.cl", "Despacho", "Torre de control, pedidos y fichas de camiones y despachos"],
+    ["jefatura@cofrial.cl", "Jefatura comercial", "CRM completo, pedidos y fichas de clientes"],
+    ["benjamin", "Administrador", "Todo, incluidos los usuarios y la auditoría"],
   ], [2900, 2300, 4438]),
-  p([t("Las contraseñas no están escritas en este manual. Las define el equipo con el comando changepassword en el servidor.", { italics: true, color: NIEBLA })]),
+  p([t("Las contraseñas no están escritas en este manual. Las define el equipo con el comando changepassword en el servidor; jefatura@cofrial.cl todavía no tiene una.", { italics: true, color: NIEBLA })]),
 );
 
 // ---------- 2. Tienda ----------
@@ -149,31 +151,46 @@ contenido.push(...pantalla({ titulo: "2.5 Mis pedidos", imagenArchivo: "06_tiend
   detras: ["Cada cliente ve solo sus propios pedidos. Si cambia el número en la dirección para mirar el pedido de otro, recibe un error 404."] }));
 
 // ---------- 3. Intranet ----------
-contenido.push(h1("3. Intranet: ingreso y navegación"),
-  p("La intranet agrupa las herramientas del personal: CRM, torre de control, pedidos y administración. Se entra desde https://crm.cofrial-temuco.duckdns.org."));
-contenido.push(...pantalla({ titulo: "3.1 Verificación en dos pasos", imagenArchivo: "07_intranet_2fa.png", pie: "La primera vez se activa el segundo factor escaneando el código QR",
+contenido.push(h1("3. Intranet: ingreso, roles y navegación"),
+  p("La intranet agrupa las herramientas del personal: CRM, torre de control, pedidos y administración. Tiene un solo ingreso y cada persona ve únicamente lo que corresponde a su rol."));
+contenido.push(...pantalla({ titulo: "3.1 Ingreso a la intranet", imagenArchivo: "07b_ingreso.png", pie: "Ingreso único del personal",
+  direccion: "https://crm.cofrial-temuco.duckdns.org o https://ops.cofrial-temuco.duckdns.org (ambas llevan al mismo ingreso)", quien: "Todo el personal.",
+  para: "Es la única puerta de entrada del personal. Después de la contraseña y del código del celular, el sistema lleva a cada persona a la pantalla de su trabajo: ventas llega al embudo comercial, despacho a la torre de control.",
+  detras: ["Después de 5 intentos fallidos el acceso se bloquea por una hora.", "Un cliente de la tienda que pruebe una dirección interna recibe un error 404, como si no existiera."] }));
+contenido.push(...pantalla({ titulo: "3.2 Verificación en dos pasos", imagenArchivo: "07_intranet_2fa.png", pie: "La primera vez se activa el segundo factor escaneando el código QR",
   quien: "Todo el personal interno, cada vez que inicia sesión.",
-  para: "Agrega una segunda llave además de la contraseña: un código de 6 dígitos que cambia cada 30 segundos en el celular del trabajador. Aunque alguien robe la contraseña, no puede entrar sin el celular.",
+  para: "Agrega una segunda llave además de la contraseña: un código de 6 dígitos que cambia cada 30 segundos en el celular del trabajador. Aunque alguien robe la contraseña, no puede entrar sin el celular. Hasta pasar este paso no se muestra ningún menú.",
   ref: L(), pasos: ["Inicia sesión con tu correo y contraseña.", "La primera vez aparece un código QR: escanéalo con Google Authenticator o Microsoft Authenticator.", "Escribe los 6 dígitos que muestra la aplicación y presiona Verificar.", "Las siguientes veces solo se pide el código."] }));
-contenido.push(h2("3.2 El menú lateral"),
-  p("Todas las pantallas internas tienen el mismo menú a la izquierda, para moverse sin perderse:"),
-  punto([b("Ventas (CRM): "), t("embudo comercial.")]),
-  punto([b("Torre de control: "), t("flota y alertas de frío.")]),
-  punto([b("Pedidos y catálogo: "), t("gestión de pedidos, productos y stock.")]),
-  punto([b("Administración: "), t("clientes, interacciones, usuarios y auditoría.")]),
-  p("Abajo aparece el correo de la persona conectada y el enlace Cerrar sesión. La franja de colores del borde (azul, verde y rojo) es la escala de temperatura que usa todo el sistema: azul para congelado, verde para refrigerado y rojo para fuera de rango."));
+contenido.push(h2("3.3 Volver a escanear el código QR"),
+  p("Si cambiaste de teléfono o quieres vincular otra aplicación de autenticación:"),
+  paso(L(), "Inicia sesión normalmente, con el código de tu celular actual."),
+  paso(listas[listas.length - 1], "En el menú lateral, abajo, presiona Vincular otro celular."),
+  paso(listas[listas.length - 1], "Presiona Mostrar un código QR nuevo. El código del celular anterior deja de servir."),
+  paso(listas[listas.length - 1], "Escanea el QR nuevo y escribe los 6 dígitos."),
+  nota("Si perdiste el celular:", "no puedes hacerlo tú, porque el sistema exige el código actual para cambiarlo. El administrador lo reinicia en el servidor con: python manage.py reiniciar_2fa tu-correo. La próxima vez que entres verás un QR nuevo. Ambos casos quedan en la auditoría.", RUPTURA));
+contenido.push(h2("3.4 El menú lateral y los roles"),
+  p("Todas las pantallas internas tienen el mismo menú a la izquierda. El menú muestra solo las secciones que el rol puede abrir, y el rol aparece bajo el correo de la persona conectada."),
+  tabla(["Rol", "Secciones que ve", "Pantalla de inicio"], [
+    ["Ventas", "Ventas (CRM); Prospectos y mensajes", "Embudo comercial"],
+    ["Despacho", "Torre de control; Pedidos y catálogo; Camiones y despachos", "Torre de control"],
+    ["Jefatura comercial", "Ventas (CRM); Pedidos y catálogo; Prospectos y mensajes", "Embudo comercial"],
+    ["Administrador", "Todas, más Administración (usuarios, auditoría y bloqueos)", "Embudo comercial"],
+  ], [2200, 4838, 2600]),
+  ...imagen("08b_ventas_sin_acceso.png", "Una vendedora intentó abrir la torre de control: el sistema la devolvió a su sección con un aviso"),
+  p("Si alguien escribe a mano la dirección de una sección que no le corresponde, el sistema lo devuelve a la suya y registra el intento en la auditoría como ACCESO_DENEGADO."),
+  p("Abajo del menú están Cambiar contraseña, Vincular otro celular y Cerrar sesión. La franja de colores del borde (azul, verde y rojo) es la escala de temperatura que usa todo el sistema: azul para congelado, verde para refrigerado y rojo para fuera de rango."));
 
 // ---------- 4. CRM ----------
 contenido.push(h1("4. Ventas (CRM)"));
 contenido.push(...pantalla({ titulo: "4.1 Embudo comercial", imagenArchivo: "08_crm_embudo.png", pie: "Embudo con las oportunidades por etapa y los reclamos urgentes arriba",
-  direccion: "https://crm.cofrial-temuco.duckdns.org/crm/", quien: "Vendedores (ven solo sus oportunidades) y jefatura comercial (ve todas).",
+  direccion: "https://crm.cofrial-temuco.duckdns.org/crm/", quien: "Ventas (cada vendedor ve solo sus oportunidades) y jefatura comercial (ve todas).",
   para: "Reemplaza la cartera de clientes que cada vendedor llevaba en su celular. Cada tarjeta es una oportunidad de venta y cada columna una etapa: Prospecto, Contactado, Calificado, Propuesta, Negociación, Ganado y Perdido. Arriba aparecen los reclamos urgentes que la inteligencia artificial detectó en los mensajes de los clientes.",
   ref: L(), pasos: ["Revisa primero los reclamos urgentes del recuadro rojo.", "Para avanzar una oportunidad, elige la nueva etapa en su lista y presiona Mover.", "Para registrar un cliente potencial nuevo, presiona Nuevo prospecto.", "El encabezado de cada columna muestra cuántas oportunidades hay y el monto estimado."],
   detras: ["Cada cambio de etapa queda en la auditoría con el nombre de quien lo hizo.", "Un vendedor no puede mover la oportunidad de otro: el sistema responde 404."] }));
 contenido.push(h2("4.2 Clasificación automática con inteligencia artificial"),
   p("Cuando se registra un mensaje de un cliente (correo, llamada o portal), el sistema lo envía a Google Gemini (plan gratuito), que lo clasifica en Reclamo, Cotización, Despacho, Facturación u Otro, con urgencia Alta, Media o Baja."),
-  ...imagen("15_admin_nueva_interaccion.png", "Registro de un mensaje de cliente en Administración → Interacciones → Añadir"),
-  paso(L(), "Entra a Administración → Interacciones → Añadir interacción."),
+  ...imagen("15_admin_nueva_interaccion.png", "Registro de un mensaje de cliente en Prospectos y mensajes → Interacciones → Añadir"),
+  paso(L(), "En el menú, entra a Prospectos y mensajes (o Administración) → Interacciones → Añadir interacción."),
   paso(listas[listas.length - 1], "Elige el cliente, el canal (Correo, Teléfono, Portal o Reunión) y escribe el mensaje."),
   paso(listas[listas.length - 1], "Presiona Guardar. La categoría y la urgencia se completan solas."),
   nota("Cuidado de los datos:", "antes de enviar el texto a Gemini, el sistema borra RUT, correos y teléfonos. Si la IA no responde, el mensaje queda como Sin clasificar y el CRM sigue funcionando.", TEMPLE));
@@ -217,9 +234,9 @@ contenido.push(...pantalla({ titulo: "6.3 Detalle de un pedido", imagenArchivo: 
 contenido.push(p([b("Otras secciones del panel: "), t("Catálogo (productos, categorías y stock), Clientes, Ofertas y Reportes.")]));
 
 // ---------- 7. Administración ----------
-contenido.push(h1("7. Administración"),
-  p("Es la herramienta del administrador para revisar y corregir datos. Se abre desde el menú Administración."));
-contenido.push(...imagen("13_admin_inicio.png", "Inicio de la administración con todas las secciones"));
+contenido.push(h1("7. Administración: fichas y registros"),
+  p("Son las fichas de datos del sistema. El administrador las ve todas desde el menú Administración; ventas y despacho ven solo las suyas (Prospectos y mensajes, Camiones y despachos). Las tablas técnicas de la tienda no aparecen aquí: se gestionan en Pedidos y catálogo."));
+contenido.push(...imagen("13_admin_inicio.png", "Fichas y registros vistos por el administrador"));
 contenido.push(...pantalla({ titulo: "7.1 Clientes", imagenArchivo: "16_admin_clientes.png", pie: "Instituciones con convenio y su lista de precios",
   direccion: "Administración → Clientes",
   para: "Registro de cada institución o persona: RUT, razón social, comuna, condición de pago, lista de precios y si dio su consentimiento para el uso de sus datos (Ley 21.719)." }));
@@ -261,7 +278,9 @@ contenido.push(h1("10. Problemas comunes"),
   tabla(["Qué pasa", "Por qué", "Qué hacer"], [
     ["Ninguna página carga", "El laboratorio de AWS Academy está apagado", "Iniciar el laboratorio (Start Lab) y esperar unos 10 minutos a que RDS esté disponible"],
     ["Usuario bloqueado al iniciar sesión", "Se equivocó 5 veces seguidas", "Esperar una hora, o que el administrador borre el bloqueo en Administración → Access attempts"],
-    ["Perdí el celular con el código de 2FA", "El segundo factor está en ese celular", "El administrador borra el dispositivo en Administración → TOTP devices y la persona escanea un QR nuevo"],
+    ["Perdí el celular con el código de 2FA", "El segundo factor está en ese celular", "El administrador ejecuta python manage.py reiniciar_2fa con el correo de la persona, que luego escanea un QR nuevo"],
+    ["Quiero cambiar de celular", "El segundo factor está vinculado al anterior", "Menú lateral → Vincular otro celular"],
+    ["Me devuelve a mi sección con un aviso", "La sección no corresponde al rol", "Pedir al administrador que agregue a la persona al grupo correcto"],
     ["El mapa 3D no aparece", "Falta la clave de Mapbox o el navegador no soporta 3D", "La torre muestra el mapa 2D. Revisar la clave MAPBOX_TOKEN en Secrets Manager"],
     ["Un gráfico de Metabase dice Hubo un problema", "Falla de carga del navegador", "Recargar la página"],
     ["La torre dice que no llegan lecturas", "El simulador IoT está detenido", "Revisar el servidor cofrial-iot en EC2"],
