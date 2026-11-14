@@ -1,0 +1,50 @@
+{% extends "interno/base.html" %}
+{% block titulo %}Torre de control{% endblock %}
+{% block contenido %}
+<meta http-equiv="refresh" content="30">
+<h1>Torre de control</h1>
+<p class="sub">{{ flota|length }} camiones transmitiendo · <span class="pill {% if fuera_de_rango %}alerta{% else %}ok{% endif %}">{{ fuera_de_rango }} fuera de rango</span> · se actualiza cada 30 s</p>
+
+<div class="panel" style="margin-bottom:16px">
+  <h2 style="font-size:17px;margin:0 0 8px">Alertas activas</h2>
+  {% for a in activas %}
+  <article style="border:1px solid #f3b4ba;background:#fff7f8;border-radius:8px;padding:10px;margin-bottom:10px">
+    <b>Camión {{ a.camion_id }}</b>
+    <span class="pill alerta">{{ a.temp_extrema }} °C</span>
+    <span class="pill {% if a.estado == 'EN_GESTION' %}aviso{% else %}alerta{% endif %}">{{ a.get_estado_display }}</span>
+    {% if a.fin_en %}<span class="pill ok">temperatura normalizada</span>{% endif %}
+    <span style="color:#5b6b77;font-size:13px"> desde {{ a.inicio_en|date:"H:i:s" }}</span>
+    {% if a.despacho %}
+      <div style="font-size:13px;margin-top:4px">Pedidos afectados:
+        {% for dp in a.despacho.pedidos.all %}<span class="pill">{{ dp.pedido.number }}</span>{% empty %}ninguno{% endfor %}
+      </div>
+    {% endif %}
+    {% if a.atendida_por %}<div style="font-size:13px;margin-top:4px">Responsable: <b>{{ a.atendida_por.email|default:a.atendida_por.username }}</b> — {{ a.accion_tomada }}</div>{% endif %}
+    <form method="post" action="{% url 'logistica:tomar' a.pk %}" style="margin-top:8px;display:flex;gap:6px">
+      {% csrf_token %}
+      <input name="accion_tomada" placeholder="Acción tomada (ej.: conductor revisa el equipo de frío)" style="flex:1" maxlength="2000" required>
+      <button type="submit">{% if a.atendida_por %}Actualizar{% else %}Tomar alerta{% endif %}</button>
+    </form>
+  </article>
+  {% empty %}
+  <p class="pill ok">Sin alertas activas</p>
+  {% endfor %}
+</div>
+
+<div class="panel">
+  <h2 style="font-size:17px;margin:0 0 8px">Flota en tiempo real</h2>
+  <table>
+    <tr><th>Camión</th><th>Régimen</th><th>Temp. cámara</th><th>Combustible</th><th>Posición</th><th>Última lectura</th><th>Estado</th></tr>
+    {% for c in flota %}
+    <tr>
+      <td>{{ c.camion_id }}</td><td>{{ c.regimen }}</td><td>{{ c.temp_camara }} °C</td><td>{{ c.combustible_pct }} %</td>
+      <td style="font-family:monospace;font-size:12px">{{ c.lat }}, {{ c.long }}</td>
+      <td>{{ c.registrado_en|date:"H:i:s" }}</td>
+      <td>{% if c.alerta_ruptura_frio %}<span class="pill alerta">fuera de rango</span>{% else %}<span class="pill ok">ok</span>{% endif %}</td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="7">No hay lecturas en los últimos 10 minutos. Revisa que el simulador IoT esté funcionando.</td></tr>
+    {% endfor %}
+  </table>
+</div>
+{% endblock %}

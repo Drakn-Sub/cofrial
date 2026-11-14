@@ -79,6 +79,7 @@ INSTALLED_APPS = [
     # Desarrollo propio
     "cuentas",
     "crm",
+    "logistica",
 ]
 
 MIDDLEWARE = [
