@@ -259,3 +259,4 @@ LOGGING = {
 # --- Integración de IA (Fase 10) ---
 IA_API_KEY = os.environ.get("IA_API_KEY", "")
 IA_MODELO = os.environ.get("IA_MODELO", "gemini-3.8-flash")  # 2.5 ya no se habilita en cuentas nuevas
+IA_TIMEOUT_SEG = int(os.environ.get("IA_TIMEOUT_SEG", "10"))
