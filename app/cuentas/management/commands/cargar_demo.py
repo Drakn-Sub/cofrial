@@ -128,7 +128,11 @@ class Command(BaseCommand):
             return u
 
         vendedores = self._grupo("Vendedores", ["crm"], ["cuentas.view_cliente", "cuentas.view_comuna"])
-        despacho = self._grupo("Despacho", ["logistica"], ["order.view_order", "order.change_order"])
+        # El panel de pedidos de Oscar exige los cuatro permisos de pedido juntos (DashboardPermission "order").
+        # No hay pantalla para crear ni borrar pedidos desde el panel: en la práctica Despacho ve y cambia estados.
+        despacho = self._grupo(
+            "Despacho", ["logistica"], ["order.view_order", "order.change_order", "order.add_order", "order.delete_order"]
+        )
         jefatura = self._grupo("Jefatura comercial", ["crm", "cuentas"], ["order.view_order"])
 
         comprador = usuario("compras@hospital-demo.cl", "Compras Hospital")
