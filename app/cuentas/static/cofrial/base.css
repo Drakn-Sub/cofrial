@@ -1,0 +1,38 @@
+/* Cofrial: tipografía y colores compartidos por la tienda, la intranet y el panel de pedidos.
+   Las fuentes se sirven desde nuestro propio servidor (licencia SIL OFL), sin llamadas a terceros. */
+@font-face {
+  font-family: "Archivo";
+  font-style: normal;
+  font-weight: 100 900;
+  font-stretch: 62% 125%;
+  font-display: swap;
+  src: url("fuentes/archivo-latin-wdth-normal.woff2") format("woff2-variations");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2212;
+}
+@font-face {
+  font-family: "Archivo";
+  font-style: normal;
+  font-weight: 100 900;
+  font-stretch: 62% 125%;
+  font-display: swap;
+  src: url("fuentes/archivo-latin-ext-wdth-normal.woff2") format("woff2-variations");
+  unicode-range: U+0100-02AF, U+0304, U+0308, U+0329, U+1E00-1EFF, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+:root {
+  /* Paleta de la cadena de frío */
+  --hielo: #e6edf1;      /* fondo general */
+  --escarcha: #f7fafb;   /* superficies */
+  --pizarra: #17242c;    /* texto y menú lateral */
+  --niebla: #5b6d78;     /* texto secundario */
+  --linea: #c7d4db;      /* bordes */
+  --glaciar: #2d6a97;    /* congelado y acciones principales */
+  --glaciar-hondo: #22547a;
+  --temple: #2f8a72;     /* refrigerado / en rango */
+  --ruptura: #c43d2b;    /* fuera de rango */
+  --ruptura-suave: #f8e3df;
+  --temple-suave: #dcefe8;
+  --glaciar-suave: #dce8f1;
+
+  --titulos: "Archivo", "Arial Narrow", Arial, sans-serif;
+  --texto: "Archivo", Arial, sans-serif;  /* una sola familia: ancho normal para leer, angosta para títulos */
+}

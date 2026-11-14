@@ -24,6 +24,9 @@ def kanban(request):
     etapas = EtapaPipeline.objects.prefetch_related(
         Prefetch("oportunidad_set", queryset=visibles, to_attr="tarjetas")
     )
+    etapas = list(etapas)
+    for etapa in etapas:  # total estimado por columna, para leer el embudo de un vistazo
+        etapa.total = sum(o.monto_estimado or 0 for o in etapa.tarjetas)
     resumen = visibles.exclude(etapa__es_cierre=True).aggregate(total=Sum("monto_estimado"), cantidad=Count("id"))
     urgentes = (
         Interaccion.objects.filter(urgencia_ia="ALTA", categoria_ia="RECLAMO")

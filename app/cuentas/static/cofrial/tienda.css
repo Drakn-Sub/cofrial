@@ -1,0 +1,85 @@
+/* Tienda de Cofrial: identidad sobre la base Bootstrap 4 de django-oscar. */
+body {
+  background: var(--hielo);
+  color: var(--pizarra);
+  font-family: var(--texto);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+h1, h2, h3, h4, .h1, .h2, .h3 { font-family: var(--titulos); font-stretch: 82%; font-weight: 700; color: var(--pizarra); }
+a { color: var(--glaciar); }
+a:hover { color: var(--glaciar-hondo); }
+:focus-visible { outline: 3px solid var(--glaciar); outline-offset: 2px; }
+
+/* Barra superior de cuenta */
+.navbar-accounts { background: var(--pizarra) !important; padding-top: 4px; padding-bottom: 4px; font-size: .9rem; }
+.navbar-accounts .nav-link { color: #c3d3dc !important; }
+.navbar-accounts .nav-link:hover { color: #fff !important; }
+
+/* Cabecera con la marca */
+.header { padding-top: 26px; padding-bottom: 0; }
+.marca-tienda a {
+  font-family: var(--titulos); font-stretch: 68%; font-weight: 800;
+  font-size: 3.4rem; line-height: .9; color: var(--pizarra); text-decoration: none;
+}
+.marca-tienda p { margin: 8px 0 18px; max-width: 46ch; color: var(--niebla); }
+.basket-mini { font-size: .92rem; }
+.basket-mini strong { font-weight: 700; }
+
+/* Navegación principal: una franja térmica bajo la barra, la firma de la marca */
+.header .navbar.bg-dark {
+  background: var(--glaciar) !important; border-radius: 0;
+  border-bottom: 5px solid; border-image: linear-gradient(90deg, var(--glaciar-hondo) 0 55%, var(--temple) 55% 88%, var(--ruptura) 88% 100%) 1;
+}
+.header .navbar .nav-link { color: #e5eff6 !important; font-family: var(--titulos); font-stretch: 90%; font-weight: 600; }
+.header .navbar .btn, .header .navbar .form-control { border-radius: 3px; }
+.header .navbar .btn-default, .header .navbar .btn-secondary { background: var(--pizarra); border-color: var(--pizarra); color: #fff; }
+
+.page { background: var(--escarcha); border: 1px solid var(--linea); border-top: 0; padding-top: 22px; padding-bottom: 32px; }
+.breadcrumb { background: transparent; padding-left: 0; font-size: .9rem; }
+.page-header { border-bottom: 1px solid var(--linea); margin-bottom: 18px; }
+.page-header h1 { font-size: 2.4rem; font-stretch: 76%; }
+
+/* Botones */
+.btn { border-radius: 3px; font-weight: 700; }
+.btn-primary { background: var(--glaciar); border-color: var(--glaciar); }
+.btn-primary:hover, .btn-primary:focus { background: var(--glaciar-hondo); border-color: var(--glaciar-hondo); }
+.btn-success { background: var(--temple); border-color: var(--temple); }
+.btn-success:hover { background: #26745f; border-color: #26745f; }
+
+/* Productos del catálogo */
+.product_pod { background: #fff; border: 1px solid #d8e2e8; border-radius: 3px; padding: 10px 10px 14px; height: auto; }
+.product_pod .image_container { border: 0; padding: 0; margin-bottom: 10px; min-height: 0; }
+.product_pod .image_container img { border-radius: 2px; }
+.product_pod h3 { font-size: 1.05rem; font-stretch: 88%; font-weight: 650; line-height: 1.25; height: 2.6em; overflow: hidden; margin: 4px 0 6px; }
+.product_pod h3 a { color: var(--pizarra); }
+.product_pod .product_price { position: static; width: auto; }
+.product_pod .product_price form, .product_pod .product_price .btn { width: 100%; }
+.product_pod .price_color, .price_color { color: var(--glaciar-hondo); font-family: var(--titulos); font-stretch: 85%; font-weight: 800; font-size: 1.35rem; }
+.product_pod .availability, .availability { font-size: .85rem; }
+.instock { color: var(--temple); }
+.star-rating { display: none; } /* sin reseñas en la tienda institucional */
+ol.row > li, .row > li { margin-bottom: 18px; }
+
+/* Ficha de producto */
+.product_main h1 { font-size: 2.2rem; }
+.product_main .price_color { font-size: 2rem; }
+#product_description + p { max-width: 65ch; }
+
+/* Barra lateral de categorías */
+.side_categories, .sidebar .card { border-radius: 3px; border-color: var(--linea); }
+
+/* Pie */
+.pie-tienda { margin-top: 0; padding: 28px 0 36px; background: var(--pizarra); color: #b9cbd5; font-size: .9rem; }
+.pie-tienda b { display: block; margin-bottom: 6px; color: #fff; font-family: var(--titulos); font-stretch: 88%; font-size: 1.05rem; }
+.pie-tienda p { max-width: 38ch; }
+
+.alert { border-radius: 3px; }
+.alert-success { background: var(--temple-suave); border-color: #b7dccd; color: #1d5a49; }
+.alert-danger { background: var(--ruptura-suave); border-color: #efc2b9; color: #8e2b1e; }
+.alert-info { background: var(--glaciar-suave); border-color: #bcd2e3; color: var(--glaciar-hondo); }
+
+@media (max-width: 575px) {
+  .marca-tienda a { font-size: 2.6rem; }
+  .page-header h1 { font-size: 1.9rem; }
+}
