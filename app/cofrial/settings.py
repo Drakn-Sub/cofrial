@@ -260,3 +260,5 @@ LOGGING = {
 IA_API_KEY = os.environ.get("IA_API_KEY", "")
 IA_MODELO = os.environ.get("IA_MODELO", "gemini-flash-lite-latest")  # liviano y disponible en el plan gratuito
 IA_TIMEOUT_SEG = int(os.environ.get("IA_TIMEOUT_SEG", "10"))
+# Mapa 3D de la torre de control. Es un token público (pk.) restringido por URL en la cuenta de Mapbox.
+MAPBOX_TOKEN = os.environ.get("MAPBOX_TOKEN", "")
