@@ -17,6 +17,8 @@ para volver al CRM, la torre de control o la administración desde el panel de p
     <link rel="stylesheet" href="{% static "oscar/js/select2/select2.min.css" %}" />
     <link rel="stylesheet" href="{% static "oscar/css/select2-bootstrap.min.css" %}" />
     <link rel="stylesheet" href="{% static "oscar/js/bootstrap4-datetimepicker/tempusdominus-bootstrap-4.min.css" %}" />
+    <link rel="stylesheet" href="{% static "cofrial/base.css" %}">
+    <link rel="stylesheet" href="{% static "cofrial/panel.css" %}">
 {% endblock %}
 
 {% block title %}
@@ -25,14 +27,14 @@ para volver al CRM, la torre de control o la administración desde el panel de p
 
 {% block layout %}
     {% block navbar %}
-<nav class="navbar navbar-expand-lg navbar-dark navbar-accounts" style="background:#14232e">
-  <a class="navbar-brand" href="/crm/"><b>Cofrial</b> <small style="color:#9fb3c0">· intranet</small></a>
+<nav class="navbar navbar-expand-lg navbar-dark navbar-accounts navbar-cofrial">
+  <a class="navbar-brand" href="/crm/">Cofrial <small>intranet</small></a>
   <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#barra_cofrial" aria-controls="barra_cofrial" aria-expanded="false" aria-label="Menú">
     <i class="fas fa-bars"></i>
   </button>
   <div class="collapse navbar-collapse" id="barra_cofrial">
     <ul class="navbar-nav mr-auto">
-      <li class="nav-item"><a class="nav-link" href="/crm/">CRM</a></li>
+      <li class="nav-item"><a class="nav-link" href="/crm/">Ventas (CRM)</a></li>
       <li class="nav-item"><a class="nav-link" href="/ops/">Torre de control</a></li>
       <li class="nav-item"><a class="nav-link active" href="/dashboard/">Pedidos y catálogo</a></li>
       <li class="nav-item"><a class="nav-link" href="/admin/">Administración</a></li>

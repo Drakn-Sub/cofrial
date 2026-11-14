@@ -1,0 +1,153 @@
+/* Intranet de Cofrial: CRM, torre de control y verificación en dos pasos. */
+* { box-sizing: border-box; }
+html { font-size: 16px; }
+body {
+  margin: 0;
+  background: var(--hielo);
+  color: var(--pizarra);
+  font-family: var(--texto);
+  line-height: 1.5;
+}
+a { color: var(--glaciar); }
+:focus-visible { outline: 3px solid var(--glaciar); outline-offset: 2px; }
+
+/* ---- Estructura: menú lateral fijo + contenido ---- */
+.marco { display: grid; grid-template-columns: 216px minmax(0, 1fr); min-height: 100vh; }
+.riel {
+  position: sticky; top: 0; height: 100vh;
+  display: flex; flex-direction: column;
+  background: var(--pizarra); color: #dbe6ec;
+  border-right: 5px solid;
+  /* la escala térmica de la marca: congelado, refrigerado, ruptura */
+  border-image: linear-gradient(180deg, var(--glaciar) 0 55%, var(--temple) 55% 88%, var(--ruptura) 88% 100%) 1;
+}
+.riel .marca {
+  padding: 22px 20px 26px;
+  font-family: var(--titulos); font-stretch: 72%; font-weight: 800;
+  font-size: 1.85rem; line-height: 1; letter-spacing: .01em; color: #fff; text-decoration: none;
+}
+.riel .marca small { display: block; margin-top: 6px; font-stretch: 100%; font-weight: 400; font-size: .78rem; color: #8ea4b1; letter-spacing: 0; }
+.riel nav { display: flex; flex-direction: column; }
+.riel nav a {
+  display: block; padding: 11px 20px; color: #c3d3dc; text-decoration: none;
+  font-family: var(--titulos); font-stretch: 88%; font-weight: 500; font-size: 1.02rem;
+  border-left: 4px solid transparent;
+}
+.riel nav a:hover { background: #20323c; color: #fff; }
+.riel nav a[aria-current="page"] { border-left-color: #fff; background: #223541; color: #fff; font-weight: 700; }
+.riel .tienda { margin-top: 10px; border-top: 1px solid #2b3f4b; padding-top: 10px; }
+.riel .yo { margin-top: auto; padding: 16px 20px 20px; font-size: .82rem; color: #8ea4b1; border-top: 1px solid #2b3f4b; }
+.riel .yo b { display: block; color: #dbe6ec; font-weight: 400; word-break: break-all; }
+.riel .yo a { color: #c3d3dc; }
+
+main { padding: 26px 32px 48px; max-width: 1480px; width: 100%; }
+.encabezado { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 12px 24px; margin-bottom: 20px; }
+h1 {
+  margin: 0; font-family: var(--titulos); font-stretch: 78%; font-weight: 700;
+  font-size: 2.3rem; line-height: 1.05;
+}
+h2 { margin: 0 0 10px; font-family: var(--titulos); font-stretch: 88%; font-weight: 650; font-size: 1.2rem; }
+.bajada { margin: 4px 0 0; color: var(--niebla); max-width: 70ch; }
+
+/* ---- Piezas ---- */
+.superficie { background: var(--escarcha); border: 1px solid var(--linea); border-radius: 3px; padding: 16px 18px; }
+.estado { display: inline-flex; align-items: center; gap: 7px; padding: 3px 10px; border-radius: 2px; font-size: .86rem; font-weight: 700; background: var(--temple-suave); color: #1d5a49; }
+.estado::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: currentColor; }
+.estado.ruptura { background: var(--ruptura-suave); color: #8e2b1e; }
+.estado.gestion { background: #f6ecd2; color: #6d5410; }
+.dato { color: var(--niebla); font-size: .9rem; }
+.cifra { font-variant-numeric: tabular-nums; }
+
+button, .boton {
+  display: inline-block; padding: 8px 14px; border: 0; border-radius: 3px; cursor: pointer;
+  background: var(--glaciar); color: #fff; font: 700 .92rem var(--texto); text-decoration: none;
+}
+button:hover, .boton:hover { background: var(--glaciar-hondo); }
+button.secundario { background: transparent; color: var(--glaciar); border: 1px solid var(--glaciar); }
+input, select, textarea {
+  font: inherit; padding: 7px 10px; border: 1px solid var(--linea); border-radius: 3px; background: #fff; color: var(--pizarra);
+}
+label { font-weight: 700; font-size: .92rem; }
+table { width: 100%; border-collapse: collapse; font-size: .93rem; }
+th { text-align: left; font-weight: 700; color: var(--niebla); border-bottom: 2px solid var(--linea); padding: 6px 8px; }
+td { border-bottom: 1px solid #dde6eb; padding: 8px; vertical-align: top; }
+.mensajes { list-style: none; margin: 0 0 18px; padding: 0; }
+.mensajes li { padding: 10px 14px; border-left: 4px solid var(--temple); background: var(--temple-suave); margin-bottom: 6px; }
+.mensajes li.error { border-color: var(--ruptura); background: var(--ruptura-suave); }
+
+/* ---- Torre de control ---- */
+.alertas { margin-bottom: 20px; border-left: 6px solid var(--ruptura); background: #fff; padding: 14px 18px; border-radius: 0 3px 3px 0; }
+.alertas.vacia { border-left-color: var(--temple); background: var(--escarcha); padding: 10px 18px; }
+.alerta + .alerta { border-top: 1px solid #ecd6d1; margin-top: 12px; padding-top: 12px; }
+.alerta .titulo { font-family: var(--titulos); font-stretch: 85%; font-weight: 700; font-size: 1.35rem; color: var(--ruptura); }
+.alerta form { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+.alerta form input { flex: 1 1 320px; }
+.chip { display: inline-block; padding: 1px 8px; margin: 2px 4px 2px 0; border: 1px solid var(--linea); border-radius: 2px; background: #fff; font-size: .84rem; font-variant-numeric: tabular-nums; }
+
+.torre { display: grid; grid-template-columns: minmax(0, 1fr) 400px; gap: 20px; align-items: start; }
+#mapa { height: 620px; border: 1px solid var(--linea); border-radius: 3px; background: #dfe7ec; }
+.leyenda { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 8px; font-size: .86rem; color: var(--niebla); }
+.leyenda i { display: inline-block; width: 11px; height: 11px; border-radius: 50%; margin-right: 6px; vertical-align: -1px; }
+
+.flota { max-height: 660px; overflow-y: auto; padding: 0; }
+.flota h2 { position: sticky; top: 0; background: var(--escarcha); margin: 0; padding: 14px 16px 10px; border-bottom: 1px solid var(--linea); z-index: 1; }
+.camion { display: grid; grid-template-columns: 62px 1fr 64px; gap: 4px 12px; align-items: center; padding: 9px 16px; border-bottom: 1px solid #e1e8ec; }
+.camion .id { font-family: var(--titulos); font-stretch: 80%; font-weight: 700; font-size: 1.05rem; }
+.camion .grados { text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; }
+.camion .meta { grid-column: 2 / 4; display: flex; justify-content: space-between; font-size: .78rem; color: var(--niebla); }
+.camion.fuera { background: var(--ruptura-suave); }
+.camion.fuera .grados { color: var(--ruptura); }
+
+/* El termómetro: la franja es el rango permitido del régimen; la marca, la temperatura actual */
+.termometro { position: relative; height: 12px; border-radius: 6px; background: #d6e0e6; }
+.termometro .rango { position: absolute; top: 0; bottom: 0; border-radius: 6px; }
+.termometro .rango.congelado { background: #a9c6dc; }
+.termometro .rango.refrigerado { background: #a8d5c6; }
+.termometro .marca-temp {
+  position: absolute; top: -4px; width: 4px; height: 20px; margin-left: -2px; border-radius: 2px; background: var(--pizarra);
+}
+.camion.fuera .marca-temp { background: var(--ruptura); box-shadow: 0 0 0 3px rgba(196, 61, 43, .25); }
+
+.recientes { margin-top: 20px; }
+
+/* ---- CRM ---- */
+.embudo { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(220px, 1fr); gap: 0; overflow-x: auto; border: 1px solid var(--linea); border-radius: 3px; background: var(--escarcha); }
+.etapa { border-right: 1px solid var(--linea); min-height: 420px; }
+.etapa:last-child { border-right: 0; }
+.etapa header { padding: 12px 14px 10px; border-bottom: 3px solid var(--glaciar); background: #fff; }
+.etapa header h2 { margin: 0; font-size: 1.05rem; }
+.etapa header .dato { font-size: .82rem; }
+.etapa.ganado header { border-bottom-color: var(--temple); }
+.etapa.perdido header { border-bottom-color: #9aa9b2; }
+.tarjeta { margin: 10px; padding: 10px 12px; background: #fff; border: 1px solid #d5e0e6; border-radius: 3px; }
+.tarjeta b { display: block; font-size: .95rem; line-height: 1.3; }
+.tarjeta .cliente { color: var(--niebla); font-size: .86rem; }
+.tarjeta .monto { margin-top: 6px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--glaciar-hondo); }
+.tarjeta form { display: flex; gap: 6px; margin-top: 8px; }
+.tarjeta select { flex: 1; font-size: .84rem; padding: 4px 6px; }
+.tarjeta button { padding: 4px 10px; font-size: .84rem; }
+.vacio { margin: 14px; color: var(--niebla); font-size: .88rem; }
+.urgentes { margin-bottom: 20px; border-left: 6px solid var(--ruptura); background: #fff; padding: 14px 18px; }
+
+/* ---- Verificación en dos pasos ---- */
+.acceso { max-width: 440px; margin: 7vh auto; }
+.acceso .codigo { width: 11ch; font-size: 1.6rem; letter-spacing: .28em; text-align: center; font-variant-numeric: tabular-nums; }
+
+/* ---- Pantallas chicas ---- */
+@media (max-width: 1100px) { .torre { grid-template-columns: 1fr; } #mapa { height: 440px; } .flota { max-height: none; } }
+@media (max-width: 760px) {
+  .marco { grid-template-columns: 1fr; }
+  .riel { position: static; height: auto; flex-direction: row; flex-wrap: wrap; align-items: center; border-right: 0; border-bottom: 5px solid; }
+  .riel .marca { padding: 12px 16px; font-size: 1.4rem; }
+  .riel .marca small, .riel .yo { display: none; }
+  .riel nav { flex-direction: row; flex-wrap: wrap; }
+  .riel nav a { padding: 10px 12px; border-left: 0; border-bottom: 3px solid transparent; }
+  .riel nav a[aria-current="page"] { border-bottom-color: #fff; }
+  .riel .tienda { margin: 0; border: 0; padding: 0; }
+  main { padding: 18px 16px 40px; }
+  h1 { font-size: 1.8rem; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+.visualmente-oculto { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.etiqueta-alerta { padding: 3px 9px; border-radius: 2px; background: var(--ruptura); color: #fff; font: 700 .85rem var(--texto); white-space: nowrap; box-shadow: 0 2px 0 rgba(23, 36, 44, .35); }
+.mapboxgl-ctrl-attrib { font-size: 11px; }

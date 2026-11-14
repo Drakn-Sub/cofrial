@@ -1,41 +1,49 @@
 {% extends "interno/base.html" %}
 {% load humanize %}
-{% block titulo %}CRM · Embudo comercial{% endblock %}
+{% block titulo %}Ventas (CRM){% endblock %}
 {% block contenido %}
-<h1>Embudo comercial</h1>
-<p class="sub">{{ resumen.cantidad|default:0 }} oportunidades abiertas · ${{ resumen.total|default:0|intcomma }} CLP estimados</p>
+<div class="encabezado">
+  <div>
+    <h1>Embudo comercial</h1>
+    <p class="bajada">{{ resumen.cantidad|default:0 }} oportunidades abiertas por <b class="cifra">${{ resumen.total|default:0|intcomma }}</b> estimados. Para avanzar una oportunidad, elige su nueva etapa y presiona Mover.</p>
+  </div>
+  <a class="boton" href="/admin/crm/prospecto/add/">Nuevo prospecto</a>
+</div>
 
 {% if urgentes %}
-<div class="panel" style="margin-bottom:16px;border-color:#f3b4ba">
-  <b>Reclamos urgentes detectados por IA</b>
-  <table style="margin-top:8px">
-    <tr><th>Fecha</th><th>Cliente</th><th>Mensaje</th></tr>
+<section class="urgentes" aria-labelledby="t-urgentes">
+  <h2 id="t-urgentes">Reclamos urgentes, clasificados por la IA</h2>
+  <table>
+    <tr><th>Recibido</th><th>Cliente</th><th>Mensaje</th></tr>
     {% for i in urgentes %}
-    <tr><td>{{ i.creado_en|date:"d-m H:i" }}</td><td>{{ i.cliente|default:"—" }}</td><td>{{ i.contenido|truncatechars:110 }}</td></tr>
+    <tr><td class="cifra">{{ i.creado_en|date:"d-m H:i" }}</td><td>{{ i.cliente|default:"Sin cliente" }}</td><td>{{ i.contenido|truncatechars:120 }}</td></tr>
     {% endfor %}
   </table>
-</div>
+</section>
 {% endif %}
 
-<div style="display:grid;grid-template-columns:repeat({{ etapas|length }},minmax(190px,1fr));gap:10px;overflow-x:auto">
+<div class="embudo">
   {% for etapa in etapas %}
-  <section class="panel" style="padding:10px;background:#eef3f6">
-    <h3 style="margin:0 0 8px;font-size:14px">{{ etapa.nombre }} <span class="pill">{{ etapa.tarjetas|length }}</span></h3>
+  <section class="etapa{% if etapa.nombre == 'Ganado' %} ganado{% elif etapa.nombre == 'Perdido' %} perdido{% endif %}" aria-label="{{ etapa.nombre }}">
+    <header>
+      <h2>{{ etapa.nombre }}</h2>
+      <span class="dato">{{ etapa.tarjetas|length }} en esta etapa{% if etapa.total %}, <span class="cifra">${{ etapa.total|intcomma }}</span>{% endif %}</span>
+    </header>
     {% for o in etapa.tarjetas %}
-    <article class="panel" style="padding:9px;margin-bottom:8px">
-      <b style="font-size:14px">{{ o.titulo }}</b><br>
-      <span style="color:#5b6b77;font-size:13px">{{ o.prospecto.razon_social }}</span><br>
-      {% if o.monto_estimado %}<span class="pill ok">${{ o.monto_estimado|intcomma }}</span>{% endif %}
-      {% if o.fecha_cierre_est %}<span class="pill">{{ o.fecha_cierre_est|date:"d-m-Y" }}</span>{% endif %}
-      <form method="post" action="{% url 'crm:mover' o.pk %}" style="margin-top:6px;display:flex;gap:4px">
+    <article class="tarjeta">
+      <b>{{ o.titulo }}</b>
+      <span class="cliente">{{ o.prospecto.razon_social }}</span>
+      {% if o.monto_estimado %}<div class="monto">${{ o.monto_estimado|intcomma }}</div>{% endif %}
+      {% if o.fecha_cierre_est %}<div class="dato">Cierre estimado {{ o.fecha_cierre_est|date:"d-m-Y" }}</div>{% endif %}
+      <form method="post" action="{% url 'crm:mover' o.pk %}">
         {% csrf_token %}
-        <select name="etapa" aria-label="Mover a etapa" style="flex:1;font-size:13px">
+        <select name="etapa" aria-label="Nueva etapa para {{ o.titulo }}">
           {% for e in todas_las_etapas %}<option value="{{ e.pk }}" {% if e.pk == o.etapa_id %}selected{% endif %}>{{ e.nombre }}</option>{% endfor %}
         </select>
-        <button type="submit" style="padding:4px 8px;font-size:13px">Mover</button>
+        <button type="submit">Mover</button>
       </form>
     </article>
-    {% empty %}<p style="color:#5b6b77;font-size:13px">Sin oportunidades</p>{% endfor %}
+    {% empty %}<p class="vacio">Sin oportunidades en esta etapa.</p>{% endfor %}
   </section>
   {% endfor %}
 </div>
