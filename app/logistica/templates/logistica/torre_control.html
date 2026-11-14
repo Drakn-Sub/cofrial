@@ -31,6 +31,41 @@
   {% endfor %}
 </div>
 
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+      integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="">
+<div class="panel" style="margin-bottom:16px">
+  <h2 style="font-size:17px;margin:0 0 8px">Mapa de la flota · La Araucanía</h2>
+  <div id="mapa" style="height:420px;border-radius:8px"></div>
+  <p class="sub" style="margin:6px 0 0;font-size:13px">
+    <span class="pill ok">● en rango</span> <span class="pill alerta">● fuera de rango</span> · haz clic en un camión para ver su temperatura
+  </p>
+</div>
+{{ puntos|json_script:"datos-flota" }}
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+<script>
+  (function () {
+    var puntos = JSON.parse(document.getElementById("datos-flota").textContent);
+    var mapa = L.map("mapa", { scrollWheelZoom: false }).setView([-38.74, -72.59], 9);
+    L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 18, attribution: "&copy; OpenStreetMap"
+    }).addTo(mapa);
+    var grupo = [];
+    puntos.forEach(function (p) {
+      var marca = L.circleMarker([p.lat, p.lon], {
+        radius: p.alerta ? 11 : 7, weight: 2, color: "#fff",
+        fillColor: p.alerta ? "#c8323c" : (p.regimen === "CONGELADO" ? "#1c6e8c" : "#2a8c5a"), fillOpacity: 0.95
+      }).addTo(mapa);
+      var texto = document.createElement("div");  // textContent: sin riesgo de XSS
+      texto.textContent = p.id + " · " + p.regimen.toLowerCase() + " · " + p.temp.toFixed(1) + " °C" + (p.alerta ? " · FUERA DE RANGO" : "");
+      marca.bindPopup(texto);
+      if (p.alerta) { marca.bringToFront(); marca.openPopup(); }
+      grupo.push([p.lat, p.lon]);
+    });
+    if (grupo.length) { mapa.fitBounds(grupo, { padding: [20, 20] }); }
+  })();
+</script>
+
 <div class="panel">
   <h2 style="font-size:17px;margin:0 0 8px">Flota en tiempo real</h2>
   <table>

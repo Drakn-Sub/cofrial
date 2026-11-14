@@ -38,6 +38,12 @@ def torre_control(request):
         "activas": activas,
         "flota": flota,
         "fuera_de_rango": sum(1 for c in flota if c["alerta_ruptura_frio"]),
+        # Datos del mapa: se entregan con json_script (escapado), nunca interpolados en JavaScript
+        "puntos": [
+            {"id": c["camion_id"], "lat": float(c["lat"]), "lon": float(c["long"]), "temp": float(c["temp_camara"]),
+             "regimen": c["regimen"], "alerta": bool(c["alerta_ruptura_frio"])}
+            for c in flota
+        ],
         "recientes": AlertaFrio.objects.filter(estado="CERRADA").select_related("atendida_por")[:10],
     }
     return render(request, "logistica/torre_control.html", contexto)
