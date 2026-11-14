@@ -1,0 +1,14 @@
+{# Menú lateral único de la intranet. Las entradas dependen del rol (cuentas/roles.py). #}
+<aside class="riel">
+  <a class="marca" href="{% if menu_intranet %}{{ menu_intranet.0.url }}{% else %}/ingresar/{% endif %}">Cofrial<small>Intranet de la cadena de frío</small></a>
+  <nav aria-label="Secciones">
+    {% for s in menu_intranet %}<a href="{{ s.url }}" {% if s.activa %}aria-current="page"{% endif %}>{{ s.nombre }}</a>{% endfor %}
+  </nav>
+  {% if user.is_authenticated %}
+  <div class="yo">Sesión de<b>{{ user.email|default:user.username }}</b>
+    <span class="rol">{{ rol_intranet }}</span>
+    {% if user.is_staff %}<a href="/admin/password_change/">Cambiar contraseña</a>{% endif %}
+    <a href="/accounts/logout/">Cerrar sesión</a>
+  </div>
+  {% endif %}
+</aside>

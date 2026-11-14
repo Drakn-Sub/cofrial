@@ -1,16 +1,10 @@
-/* Panel de pedidos y catálogo (django-oscar) con la identidad de la intranet. */
-body { font-family: var(--texto); color: var(--pizarra); background: var(--hielo); }
+/* Panel de pedidos y catálogo (django-oscar) dentro de la intranet de Cofrial. */
+body { font-family: var(--texto); color: var(--pizarra); background: var(--hielo); padding-left: 216px; }
+@media (max-width: 760px) { body { padding-left: 0; } }
 h1, h2, h3, .page-header h1 { font-family: var(--titulos); font-stretch: 82%; font-weight: 700; }
 a { color: var(--glaciar); }
-.navbar-cofrial {
-  background: var(--pizarra) !important;
-  border-bottom: 5px solid; border-image: linear-gradient(90deg, var(--glaciar) 0 55%, var(--temple) 55% 88%, var(--ruptura) 88% 100%) 1;
-}
-.navbar-cofrial .navbar-brand { background: none !important; text-indent: 0 !important; width: auto !important; height: auto !important; overflow: visible !important; font-family: var(--titulos); font-stretch: 72%; font-weight: 800; font-size: 1.55rem; color: #fff; }
-.navbar-cofrial .navbar-brand small { font-family: var(--texto); font-stretch: 100%; font-weight: 400; font-size: .8rem; color: #8ea4b1; margin-left: 4px; }
-.navbar-cofrial .nav-link { color: #c3d3dc !important; font-family: var(--titulos); font-stretch: 90%; font-weight: 500; }
-.navbar-cofrial .nav-link.active, .navbar-cofrial .nav-link:hover { color: #fff !important; }
-.navbar-primary { background: #22343f !important; }
+.navbar-primary { background: #22343f !important; border-bottom: 3px solid var(--glaciar); }
+.navbar-primary .nav-link { font-family: var(--titulos); font-stretch: 90%; }
 .btn { border-radius: 3px; }
 .btn-primary { background: var(--glaciar); border-color: var(--glaciar); }
 .btn-primary:hover { background: var(--glaciar-hondo); border-color: var(--glaciar-hondo); }

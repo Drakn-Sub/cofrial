@@ -5,28 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>{% block titulo %}Intranet{% endblock %} | Cofrial</title>
   <link rel="stylesheet" href="{% static 'cofrial/base.css' %}">
+  <link rel="stylesheet" href="{% static 'cofrial/riel.css' %}">
   <link rel="stylesheet" href="{% static 'cofrial/intranet.css' %}">
   {% block cabeza %}{% endblock %}
 </head>
 <body>
-<div class="marco">
-  <aside class="riel">
-    <a class="marca" href="/crm/">Cofrial<small>Intranet de la cadena de frío</small></a>
-    <nav aria-label="Secciones">
-      <a href="/crm/" {% if '/crm/' in request.path %}aria-current="page"{% endif %}>Ventas (CRM)</a>
-      <a href="/ops/" {% if '/ops/' in request.path %}aria-current="page"{% endif %}>Torre de control</a>
-      <a href="/dashboard/">Pedidos y catálogo</a>
-      <a href="/admin/">Administración</a>
-    </nav>
-    {% if user.is_authenticated %}
-    <div class="yo">Sesión de<b>{{ user.email|default:user.username }}</b><a href="/accounts/logout/">Cerrar sesión</a></div>
-    {% endif %}
-  </aside>
-  <main>
-    {% if messages %}<ul class="mensajes">{% for m in messages %}<li class="{{ m.tags }}">{{ m }}</li>{% endfor %}</ul>{% endif %}
-    {% block contenido %}{% endblock %}
-  </main>
-</div>
+{% include "interno/_riel.html" %}
+<main class="con-riel">
+  {% if messages %}<ul class="mensajes">{% for m in messages %}<li class="{{ m.tags }}">{{ m }}</li>{% endfor %}</ul>{% endif %}
+  {% block contenido %}{% endblock %}
+</main>
 {% block scripts %}{% endblock %}
 </body>
 </html>

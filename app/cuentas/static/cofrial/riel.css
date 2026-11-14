@@ -1,0 +1,39 @@
+/* Menú lateral de la intranet. Lo usan el CRM, la torre, el panel de pedidos y la administración. */
+.riel, .riel * { box-sizing: border-box; }
+.riel {
+  position: fixed; z-index: 1040; left: 0; top: 0; bottom: 0; width: 216px;
+  display: flex; flex-direction: column; overflow-y: auto;
+  background: var(--pizarra); color: #dbe6ec; font-family: var(--texto); font-size: 16px; line-height: 1.5;
+  border-right: 5px solid;
+  /* la escala térmica de la marca: congelado, refrigerado, ruptura */
+  border-image: linear-gradient(180deg, var(--glaciar) 0 55%, var(--temple) 55% 88%, var(--ruptura) 88% 100%) 1;
+}
+.con-riel { margin-left: 216px; }
+.riel .marca {
+  display: block; padding: 22px 20px 26px; text-decoration: none;
+  font-family: var(--titulos); font-stretch: 72%; font-weight: 800; font-size: 29.6px; line-height: 1; color: #fff;
+}
+.riel .marca small { display: block; margin-top: 6px; font-stretch: 100%; font-weight: 400; font-size: 12.5px; color: #8ea4b1; }
+.riel nav { display: flex; flex-direction: column; }
+.riel nav a, .riel nav a:link, .riel nav a:visited {
+  display: block; padding: 11px 20px; color: #c3d3dc; text-decoration: none;
+  font-family: var(--titulos); font-stretch: 88%; font-weight: 500; font-size: 16.3px;
+  border-left: 4px solid transparent;
+}
+.riel nav a:hover { background: #20323c; color: #fff; }
+.riel nav a[aria-current="page"] { border-left-color: #fff; background: #223541; color: #fff; font-weight: 700; }
+.riel .yo { margin-top: auto; padding: 16px 20px 20px; font-size: 13px; color: #8ea4b1; border-top: 1px solid #2b3f4b; }
+.riel .yo b { display: block; color: #dbe6ec; font-weight: 400; word-break: break-all; }
+.riel .yo .rol { display: inline-block; margin: 6px 0 8px; padding: 1px 8px; border: 1px solid #47606e; border-radius: 2px; color: #dbe6ec; }
+.riel .yo a, .riel .yo a:link, .riel .yo a:visited { display: block; color: #c3d3dc; }
+@media (max-width: 760px) {
+  .riel { position: static; width: auto; flex-direction: row; flex-wrap: wrap; align-items: center; border-right: 0; border-bottom: 5px solid; }
+  .con-riel { margin-left: 0; }
+  .riel .marca { padding: 12px 16px; font-size: 22px; }
+  .riel .marca small, .riel .yo b { display: none; }
+  .riel nav { flex-direction: row; flex-wrap: wrap; }
+  .riel nav a { padding: 10px 12px; border-left: 0; border-bottom: 3px solid transparent; }
+  .riel nav a[aria-current="page"] { border-bottom-color: #fff; }
+  .riel .yo { margin: 0 0 0 auto; padding: 8px 16px; border: 0; display: flex; gap: 12px; align-items: center; }
+  .riel .yo .rol { margin: 0; }
+}
