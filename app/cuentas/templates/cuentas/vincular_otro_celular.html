@@ -1,0 +1,14 @@
+{% extends "interno/base.html" %}
+{% block titulo %}Vincular otro celular{% endblock %}
+{% block contenido %}
+<div class="superficie acceso">
+  <h1>Vincular otro celular</h1>
+  <p class="bajada">Úsalo si cambiaste de teléfono o quieres volver a escanear el código QR.</p>
+  <p>Al continuar, el código de tu celular actual deja de servir y verás un código QR nuevo para escanear con Google Authenticator o Microsoft Authenticator. Hasta que lo escanees no podrás entrar a la intranet.</p>
+  <form method="post" style="display:flex;gap:10px;margin-top:18px">
+    {% csrf_token %}
+    <button type="submit">Mostrar un código QR nuevo</button>
+    <a class="boton" style="background:transparent;color:var(--glaciar);border:1px solid var(--glaciar)" href="{% if menu_intranet %}{{ menu_intranet.0.url }}{% else %}/{% endif %}">Volver</a>
+  </form>
+</div>
+{% endblock %}
