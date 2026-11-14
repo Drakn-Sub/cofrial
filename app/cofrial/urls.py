@@ -24,6 +24,7 @@ urlpatterns = [
     path("salud/", cuentas_views.salud, name="salud"),
     path("ingresar/", cuentas_views.Ingreso.as_view(), name="ingresar"),
     path("cuentas/2fa/", cuentas_views.segundo_factor, name="segundo_factor"),
+    path("cuentas/2fa/pedir-qr/", cuentas_views.pedir_qr_nuevo, name="pedir_qr_nuevo"),
     path("cuentas/2fa/otro-celular/", cuentas_views.vincular_otro_celular, name="vincular_otro_celular"),
     path("admin/", admin.site.urls),
     path("crm/", include("crm.urls")),

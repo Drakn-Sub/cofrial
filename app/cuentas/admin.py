@@ -1,4 +1,9 @@
-from django.contrib import admin
+from django.contrib import admin, messages
+from django.contrib.auth import get_user_model
+from django.contrib.auth.admin import UserAdmin
+from django_otp.plugins.otp_totp.models import TOTPDevice
+
+from .utils import auditar
 
 from .models import AuditoriaEvento, Cliente, Comuna, ListaPrecio, Perfil, PrecioLista
 
@@ -52,3 +57,33 @@ class AuditoriaEventoAdmin(admin.ModelAdmin):
 
     def has_delete_permission(self, request, obj=None):
         return False
+
+
+Usuario = get_user_model()
+admin.site.unregister(Usuario)
+
+
+@admin.register(Usuario)
+class UsuarioAdmin(UserAdmin):
+    """Usuarios con la acción para aprobar un código QR nuevo del segundo factor."""
+
+    list_display = ("username", "email", "rol", "segundo_factor", "is_active", "last_login")
+    actions = ["entregar_qr_nuevo"]
+
+    @admin.display(description="Rol")
+    def rol(self, obj):
+        from .roles import nombre_rol
+
+        return nombre_rol(obj)
+
+    @admin.display(description="Segundo factor", boolean=True)
+    def segundo_factor(self, obj):
+        return TOTPDevice.objects.filter(user=obj, confirmed=True).exists()
+
+    @admin.action(description="Entregar un código QR nuevo (reinicia el segundo factor)")
+    def entregar_qr_nuevo(self, request, queryset):
+        for persona in queryset:
+            TOTPDevice.objects.filter(user=persona).delete()
+            auditar("2FA_REINICIADO", request, entidad="usuario", entidad_id=persona.pk,
+                    detalle=f"{persona.username}: aprobado por {request.user.username}")
+        self.message_user(request, f"Listo: {queryset.count()} persona(s) verán un código QR nuevo al iniciar sesión.", messages.SUCCESS)
