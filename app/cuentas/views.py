@@ -4,6 +4,9 @@ import io
 
 import qrcode
 import qrcode.image.svg
+from datetime import timedelta
+
+from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.views import LoginView
 from django.db import connection
@@ -11,11 +14,13 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
 from django.utils.http import url_has_allowed_host_and_scheme
 from django.views.decorators.cache import never_cache
-from django.views.decorators.http import require_GET
+from django.utils import timezone
+from django.views.decorators.http import require_GET, require_POST
 from django_otp import login as otp_login
 from django_otp.plugins.otp_totp.models import TOTPDevice
 
 from . import roles
+from .models import AuditoriaEvento
 from .utils import auditar
 
 
@@ -104,6 +109,27 @@ def vincular_otro_celular(request):
         auditar("2FA_REINICIADO", request, entidad="usuario", entidad_id=usuario.pk, detalle="por la propia persona")
         return redirect("/cuentas/2fa/")
     return render(request, "cuentas/vincular_otro_celular.html")
+
+
+@never_cache
+@require_POST
+@login_required(login_url="/ingresar/")
+def pedir_qr_nuevo(request):
+    """La persona no tiene su celular: deja una solicitud para que el administrador le entregue un QR nuevo.
+
+    No se entrega el QR en el acto: con solo la contraseña, eso anularía el segundo factor.
+    El administrador aprueba en Administración → Usuarios (acción "Entregar un código QR nuevo")."""
+    usuario = request.user
+    if not usuario.is_staff:
+        return redirect("/")
+    if usuario.is_verified():
+        return redirect("/cuentas/2fa/otro-celular/")
+    hace_una_hora = timezone.now() - timedelta(hours=1)
+    if not AuditoriaEvento.objects.filter(usuario=usuario, accion="2FA_SOLICITUD", ocurrido_en__gte=hace_una_hora).exists():
+        auditar("2FA_SOLICITUD", request, entidad="usuario", entidad_id=usuario.pk, resultado="PENDIENTE",
+                detalle=f"{usuario.username} pide un código QR nuevo")
+    messages.success(request, "Solicitud enviada. Cuando el administrador la apruebe, al iniciar sesión verás un código QR nuevo.")
+    return redirect("/cuentas/2fa/")
 
 
 @require_GET

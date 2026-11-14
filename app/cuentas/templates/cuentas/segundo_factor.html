@@ -20,5 +20,12 @@
       <button type="submit">Verificar</button>
     </div>
   </form>
+  {% if not registrando %}
+  <form method="post" action="{% url 'pedir_qr_nuevo' %}" style="margin-top:22px;padding-top:16px;border-top:1px solid var(--linea)">
+    {% csrf_token %}
+    <p class="dato" style="margin:0 0 8px">¿No tienes tu celular o borraste la aplicación? Pide un código QR nuevo. El administrador debe aprobarlo antes de que puedas escanearlo.</p>
+    <button type="submit" class="secundario">Pedir un código QR nuevo</button>
+  </form>
+  {% endif %}
 </div>
 {% endblock %}

@@ -197,3 +197,14 @@ class CambioDeCelularTests(TestCase):
         respuesta = self.client.post("/cuentas/2fa/otro-celular/")
         self.assertRedirects(respuesta, "/cuentas/2fa/", fetch_redirect_response=False)
         self.assertEqual(TOTPDevice.objects.filter(user=persona).count(), 1)
+
+    def test_pedir_qr_sin_celular_deja_solicitud_y_no_reinicia_nada(self):
+        from django_otp.plugins.otp_totp.models import TOTPDevice
+
+        persona = User.objects.create_user("d@cofrial.cl", "d@cofrial.cl", "Clave-larga-123!", is_staff=True)
+        TOTPDevice.objects.create(user=persona, name="celular", confirmed=True)
+        self.client.force_login(persona)
+        self.client.post("/cuentas/2fa/pedir-qr/")
+        self.client.post("/cuentas/2fa/pedir-qr/")  # insistir no genera más solicitudes en la misma hora
+        self.assertEqual(TOTPDevice.objects.filter(user=persona).count(), 1)
+        self.assertEqual(AuditoriaEvento.objects.filter(accion="2FA_SOLICITUD", usuario=persona).count(), 1)

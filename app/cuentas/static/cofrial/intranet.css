@@ -135,3 +135,4 @@ td { border-bottom: 1px solid #dde6eb; padding: 8px; vertical-align: top; }
 .portal button { width: 100%; margin-top: 22px; padding: 11px; font-size: 1rem; }
 .portal .error { margin-top: 16px; padding: 10px 14px; border-left: 4px solid var(--ruptura); background: var(--ruptura-suave); }
 @media (max-width: 760px) { .portal { grid-template-columns: 1fr; } .portal .lado { padding: 28px 24px; border-right: 0; } .portal .lado ul { display: none; } .portal .lado .marca { font-size: 3rem; } }
+button.secundario:hover { color: #fff; }
