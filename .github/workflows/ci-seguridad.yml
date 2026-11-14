@@ -1,0 +1,84 @@
+name: ci-seguridad
+# Pipeline DevSecOps (Tabla 15 del informe): cada push pasa por secretos, SAST, SCA + SBOM,
+# pruebas automáticas, mínimo privilegio en la base de datos y configuración segura de Django.
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  secretos:
+    name: Gitleaks (secretos en el historial)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with: { fetch-depth: 0 }
+      - name: Gitleaks
+        run: |
+          curl -sSL https://github.com/gitleaks/gitleaks/releases/download/v8.24.3/gitleaks_8.24.3_linux_x64.tar.gz | tar -xz gitleaks
+          ./gitleaks git --redact --verbose --exit-code 1 .
+
+  analisis:
+    name: Bandit (SAST) y pip-audit (SCA + SBOM)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with: { python-version: "3.13", cache: pip, cache-dependency-path: app/requirements.txt }
+      - run: pip install bandit pip-audit
+      - name: Bandit (falla con severidad media o alta)
+        run: bandit -r app iot infra -x app/.venv,app/apps/partner/migrations -ll
+      - name: pip-audit (vulnerabilidades conocidas en dependencias)
+        run: pip-audit -r app/requirements.txt -r iot/requirements.txt
+      - name: SBOM CycloneDX
+        run: pip-audit -r app/requirements.txt -f cyclonedx-json -o sbom.json || true
+      - uses: actions/upload-artifact@v4
+        with: { name: sbom, path: sbom.json }
+
+  pruebas:
+    name: Pruebas, mínimo privilegio y check --deploy
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env: { POSTGRES_PASSWORD: ci_postgres, POSTGRES_DB: cofrial }
+        ports: ["5432:5432"]
+        options: --health-cmd pg_isready --health-interval 5s --health-retries 10
+    env:
+      PGPASSWORD: ci_postgres
+      SECRET_KEY: ${{ secrets.CI_SECRET_KEY || 'clave-de-prueba-solo-para-ci-no-es-un-secreto-real-9f3c7a1e5b2d8046' }}
+      DB_HOST: localhost
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with: { python-version: "3.13", cache: pip, cache-dependency-path: app/requirements.txt }
+      - run: pip install -r app/requirements.txt
+      - name: Roles de mínimo privilegio (mismo script que en RDS)
+        run: |
+          psql -h localhost -U postgres -d cofrial -v ON_ERROR_STOP=1 -q \
+            -v pw_migrate=ci_migrate -v pw_app=ci_app -v pw_iot=ci_iot -v pw_bi=ci_bi -v pw_metabase=ci_mb \
+            -f infra/sql/01_roles.sql
+      - name: Migraciones con el rol cofrial_migrate
+        working-directory: app
+        env: { DB_USER: cofrial_migrate, DB_PASSWORD: ci_migrate, DEBUG: "1" }
+        run: python manage.py migrate --noinput
+      - name: Verificación de privilegios por rol
+        env: { PW_APP: ci_app, PW_IOT: ci_iot, PW_BI: ci_bi }
+        run: |
+          psql -h localhost -U postgres -d cofrial -qc "INSERT INTO logistica.camion VALUES ('CF-001','CFR001',8000,'REFRIGERADO',true)"
+          python infra/scripts/verificar_privilegios.py
+      - name: Pruebas automáticas
+        working-directory: app
+        env: { DB_USER: postgres, DB_PASSWORD: ci_postgres, DEBUG: "1" }
+        run: python manage.py test cuentas crm logistica -v 2
+      - name: Configuración segura de Django (check --deploy)
+        working-directory: app
+        env: { DEBUG: "0", ALLOWED_HOSTS: "tienda.cofrial.cl,crm.cofrial.cl,ops.cofrial.cl" }
+        run: python manage.py check --deploy --fail-level WARNING

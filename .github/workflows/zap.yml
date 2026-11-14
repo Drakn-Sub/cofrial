@@ -1,0 +1,25 @@
+name: zap-baseline
+# Análisis dinámico (DAST) con OWASP ZAP contra el sitio desplegado. Se ejecuta a mano
+# desde la pestaña Actions, indicando la URL. Solo contra nuestro propio dominio.
+on:
+  workflow_dispatch:
+    inputs:
+      url:
+        description: "URL a analizar (ej.: https://tienda.cofrial-inacap.duckdns.org)"
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  zap:
+    runs-on: ubuntu-latest
+    steps:
+      - name: ZAP baseline
+        run: |
+          mkdir -p reporte && chmod 777 reporte
+          docker run --rm -v "$PWD/reporte:/zap/wrk" ghcr.io/zaproxy/zaproxy:stable \
+            zap-baseline.py -t "${{ inputs.url }}" -r zap.html -J zap.json -I
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: reporte-zap, path: reporte }
