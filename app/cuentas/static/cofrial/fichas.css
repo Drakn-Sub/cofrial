@@ -1,0 +1,82 @@
+/* Fichas de datos (administración de Django) con la identidad de la intranet de Cofrial. */
+html[data-theme="light"], html[data-theme="dark"], :root {
+  --primary: #2d6a97; --secondary: #17242c; --accent: #a8d5c6; --primary-fg: #fff;
+  --body-fg: #17242c; --body-bg: #e6edf1; --body-quiet-color: #5b6d78; --body-medium-color: #3d4d57; --body-loud-color: #17242c;
+  --header-bg: #17242c; --breadcrumbs-bg: transparent; --breadcrumbs-fg: #5b6d78; --breadcrumbs-link-fg: #2d6a97;
+  --link-fg: #2d6a97; --link-hover-color: #22547a; --link-selected-fg: #22547a;
+  --hairline-color: #dde6eb; --border-color: #c7d4db;
+  --darkened-bg: #f7fafb; --selected-bg: #dce8f1; --selected-row: #eef4f8;
+  --button-bg: #2d6a97; --button-hover-bg: #22547a; --button-fg: #fff;
+  --default-button-bg: #17242c; --default-button-hover-bg: #2b3f4b;
+  --close-button-bg: #5b6d78; --close-button-hover-bg: #3d4d57;
+  --delete-button-bg: #c43d2b; --delete-button-hover-bg: #a23122;
+  --object-tools-bg: #2d6a97; --object-tools-hover-bg: #22547a; --object-tools-fg: #fff;
+  --message-success-bg: #dcefe8; --message-warning-bg: #f6ecd2; --message-error-bg: #f8e3df; --error-fg: #c43d2b;
+  --font-family-primary: "Archivo", Arial, sans-serif;
+  color-scheme: light;
+}
+body { background: var(--body-bg); font-size: 15px; }
+#container { min-height: 100vh; }
+.theme-toggle { display: none; }
+
+/* Migas y título */
+div.breadcrumbs, nav[aria-label="Breadcrumbs"] .breadcrumbs, .breadcrumbs { background: transparent; color: #5b6d78; padding: 22px 32px 0; font-size: .86rem; }
+.breadcrumbs a { color: #2d6a97; }
+#content, .content, main.content { padding: 14px 32px 48px; }
+#content h1, .content h1 { font-family: "Archivo", sans-serif; font-stretch: 78%; font-weight: 700; font-size: 2.2rem; line-height: 1.05; color: #17242c; margin: 0 0 18px; }
+h2, h3, .module h2, .module caption, .inline-group h2 { font-family: "Archivo", sans-serif; font-stretch: 88%; }
+
+/* Módulos como superficies claras con una línea de marca, no cabeceras negras */
+.module { background: #f7fafb; border: 1px solid #c7d4db; border-radius: 3px; margin-bottom: 20px; overflow: hidden; }
+.module h2, .module caption, .inline-group h2, fieldset.module > h2, .filtered h2 {
+  background: #fff; color: #17242c; text-transform: none; letter-spacing: 0; font-size: 1.1rem; font-weight: 650;
+  padding: 12px 16px 10px; border-bottom: 3px solid #2d6a97;
+}
+.module caption a, .module h2 a { color: #17242c !important; }
+.dashboard #content { width: auto; max-width: 980px; }
+.dashboard .module table th { padding: 10px 16px; font-weight: 600; }
+.dashboard .module table td { padding: 10px 16px; }
+#content-related { background: transparent; }
+#content-related .module, #recent-actions-module { background: #f7fafb; }
+#recent-actions-module h2 { background: #fff; }
+
+/* Tablas */
+#changelist table thead th, table thead th { background: #fff; color: #5b6d78; text-transform: none; letter-spacing: 0; font-size: .86rem; border-bottom: 2px solid #c7d4db; }
+#changelist table thead th a, table thead th a { color: #5b6d78; }
+#changelist table tbody td, #changelist table tbody th { padding: 9px 10px; border-bottom: 1px solid #dde6eb; }
+#changelist table tbody tr:nth-child(even), #changelist table tbody tr:nth-child(odd) { background: #fff; }
+#changelist table tbody tr:hover { background: #eef4f8; }
+#changelist, #changelist .results, #changelist-form { border-radius: 3px; }
+#changelist .changelist-form-container { background: #fff; border: 1px solid #c7d4db; border-radius: 3px; }
+#toolbar { background: #f7fafb; border: 0; border-bottom: 1px solid #dde6eb; padding: 12px; }
+#changelist .actions { background: #f7fafb; padding: 10px 12px; border-bottom: 1px solid #dde6eb; }
+#changelist .paginator { background: #f7fafb; border-top: 1px solid #dde6eb; padding: 10px 12px; }
+#changelist-filter { background: #f7fafb; border: 1px solid #c7d4db; border-radius: 3px; margin-left: 20px; }
+#changelist-filter h2, #changelist-filter-header { background: #fff; color: #17242c; text-transform: none; letter-spacing: 0; font-size: 1rem; padding: 10px 14px; border-bottom: 3px solid #2f8a72; }
+#changelist-filter h3, #changelist-filter details summary { text-transform: none; letter-spacing: 0; font-size: .9rem; color: #17242c; }
+#changelist-filter li.selected a { color: #22547a; font-weight: 700; }
+
+/* Botones y formularios */
+.button, input[type=submit], input[type=button], .submit-row input, a.button, .object-tools a {
+  border-radius: 3px; text-transform: none; letter-spacing: 0; font-weight: 700; font-size: .9rem; padding: 8px 14px;
+}
+.object-tools a:link, .object-tools a:visited { background: #2d6a97; border-radius: 3px; }
+.object-tools a.addlink, .object-tools a.viewsitelink, .object-tools a.historylink { background-image: none; padding-right: 14px; }
+.submit-row { background: #f7fafb; border: 1px solid #c7d4db; border-radius: 3px; padding: 12px 16px; }
+.submit-row a.deletelink { border-radius: 3px; height: auto; padding: 8px 14px; }
+input[type=text], input[type=password], input[type=email], input[type=url], input[type=number], input[type=tel], textarea, select, .vTextField {
+  border: 1px solid #c7d4db; border-radius: 3px; padding: 7px 10px; font-family: inherit; font-size: .95rem; background: #fff;
+}
+input:focus, select:focus, textarea:focus { border-color: #2d6a97; outline: 2px solid #dce8f1; }
+.form-row { padding: 12px 16px; border-bottom: 1px solid #dde6eb; }
+.aligned label, form .aligned label { font-weight: 600; color: #17242c; }
+.help, p.help, div.help { color: #5b6d78; font-size: .84rem; }
+ul.messagelist li { border-radius: 0; border-left: 4px solid #2f8a72; background-color: #dcefe8; color: #1d5a49; padding-left: 16px; background-image: none; }
+ul.messagelist li.warning { border-color: #b8860b; background-color: #f6ecd2; color: #6d5410; }
+ul.messagelist li.error { border-color: #c43d2b; background-color: #f8e3df; color: #8e2b1e; }
+a.addlink, a.changelink, a.viewlink { font-weight: 600; }
+#footer { display: none; }
+@media (max-width: 760px) { .breadcrumbs { padding: 14px 16px 0; } #content, .content { padding: 12px 16px 40px; } }
+
+.object-tools a:link, .object-tools a:visited, .submit-row input, .submit-row input.default, .button.default, input[type=submit].default,
+#changelist-filter h2, #changelist-filter-header, #changelist-filter summary, .module caption, .module h2 { text-transform: none !important; letter-spacing: 0 !important; }

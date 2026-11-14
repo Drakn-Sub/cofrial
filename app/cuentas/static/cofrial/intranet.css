@@ -11,36 +11,8 @@ body {
 a { color: var(--glaciar); }
 :focus-visible { outline: 3px solid var(--glaciar); outline-offset: 2px; }
 
-/* ---- Estructura: menú lateral fijo + contenido ---- */
-.marco { display: grid; grid-template-columns: 216px minmax(0, 1fr); min-height: 100vh; }
-.riel {
-  position: sticky; top: 0; height: 100vh;
-  display: flex; flex-direction: column;
-  background: var(--pizarra); color: #dbe6ec;
-  border-right: 5px solid;
-  /* la escala térmica de la marca: congelado, refrigerado, ruptura */
-  border-image: linear-gradient(180deg, var(--glaciar) 0 55%, var(--temple) 55% 88%, var(--ruptura) 88% 100%) 1;
-}
-.riel .marca {
-  padding: 22px 20px 26px;
-  font-family: var(--titulos); font-stretch: 72%; font-weight: 800;
-  font-size: 1.85rem; line-height: 1; letter-spacing: .01em; color: #fff; text-decoration: none;
-}
-.riel .marca small { display: block; margin-top: 6px; font-stretch: 100%; font-weight: 400; font-size: .78rem; color: #8ea4b1; letter-spacing: 0; }
-.riel nav { display: flex; flex-direction: column; }
-.riel nav a {
-  display: block; padding: 11px 20px; color: #c3d3dc; text-decoration: none;
-  font-family: var(--titulos); font-stretch: 88%; font-weight: 500; font-size: 1.02rem;
-  border-left: 4px solid transparent;
-}
-.riel nav a:hover { background: #20323c; color: #fff; }
-.riel nav a[aria-current="page"] { border-left-color: #fff; background: #223541; color: #fff; font-weight: 700; }
-.riel .tienda { margin-top: 10px; border-top: 1px solid #2b3f4b; padding-top: 10px; }
-.riel .yo { margin-top: auto; padding: 16px 20px 20px; font-size: .82rem; color: #8ea4b1; border-top: 1px solid #2b3f4b; }
-.riel .yo b { display: block; color: #dbe6ec; font-weight: 400; word-break: break-all; }
-.riel .yo a { color: #c3d3dc; }
-
-main { padding: 26px 32px 48px; max-width: 1480px; width: 100%; }
+/* ---- Estructura: el menú lateral está en riel.css ---- */
+main { padding: 26px 32px 48px; max-width: 1480px; }
 .encabezado { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 12px 24px; margin-bottom: 20px; }
 h1 {
   margin: 0; font-family: var(--titulos); font-stretch: 78%; font-weight: 700;
@@ -136,14 +108,6 @@ td { border-bottom: 1px solid #dde6eb; padding: 8px; vertical-align: top; }
 /* ---- Pantallas chicas ---- */
 @media (max-width: 1100px) { .torre { grid-template-columns: 1fr; } #mapa { height: 440px; } .flota { max-height: none; } }
 @media (max-width: 760px) {
-  .marco { grid-template-columns: 1fr; }
-  .riel { position: static; height: auto; flex-direction: row; flex-wrap: wrap; align-items: center; border-right: 0; border-bottom: 5px solid; }
-  .riel .marca { padding: 12px 16px; font-size: 1.4rem; }
-  .riel .marca small, .riel .yo { display: none; }
-  .riel nav { flex-direction: row; flex-wrap: wrap; }
-  .riel nav a { padding: 10px 12px; border-left: 0; border-bottom: 3px solid transparent; }
-  .riel nav a[aria-current="page"] { border-bottom-color: #fff; }
-  .riel .tienda { margin: 0; border: 0; padding: 0; }
   main { padding: 18px 16px 40px; }
   h1 { font-size: 1.8rem; }
 }
@@ -151,3 +115,23 @@ td { border-bottom: 1px solid #dde6eb; padding: 8px; vertical-align: top; }
 .visualmente-oculto { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
 .etiqueta-alerta { padding: 3px 9px; border-radius: 2px; background: var(--ruptura); color: #fff; font: 700 .85rem var(--texto); white-space: nowrap; box-shadow: 0 2px 0 rgba(23, 36, 44, .35); }
 .mapboxgl-ctrl-attrib { font-size: 11px; }
+
+/* ---- Ingreso a la intranet ---- */
+.portal { min-height: 100vh; display: grid; grid-template-columns: minmax(280px, 42%) 1fr; }
+.portal .lado {
+  background: var(--pizarra); color: #c3d3dc; padding: 8vh 44px; display: flex; flex-direction: column;
+  border-right: 6px solid; border-image: linear-gradient(180deg, var(--glaciar) 0 55%, var(--temple) 55% 88%, var(--ruptura) 88% 100%) 1;
+}
+.portal .lado .marca { font-family: var(--titulos); font-stretch: 68%; font-weight: 800; font-size: 4.2rem; line-height: .9; color: #fff; }
+.portal .lado p { max-width: 34ch; margin: 18px 0 0; font-size: 1.05rem; }
+.portal .lado ul { margin: auto 0 0; padding: 0; list-style: none; font-size: .92rem; }
+.portal .lado li { padding: 8px 0; border-top: 1px solid #2b3f4b; }
+.portal .lado li b { color: #fff; font-weight: 600; }
+.portal .formulario { align-self: center; width: min(400px, 100%); margin: 0 auto; padding: 32px 24px; }
+.portal .formulario h1 { font-size: 2rem; margin-bottom: 6px; }
+.portal .campo { margin-top: 16px; }
+.portal .campo label { display: block; margin-bottom: 4px; }
+.portal .campo input { width: 100%; padding: 10px 12px; }
+.portal button { width: 100%; margin-top: 22px; padding: 11px; font-size: 1rem; }
+.portal .error { margin-top: 16px; padding: 10px 14px; border-left: 4px solid var(--ruptura); background: var(--ruptura-suave); }
+@media (max-width: 760px) { .portal { grid-template-columns: 1fr; } .portal .lado { padding: 28px 24px; border-right: 0; } .portal .lado ul { display: none; } .portal .lado .marca { font-size: 3rem; } }
