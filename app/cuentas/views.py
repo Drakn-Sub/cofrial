@@ -5,6 +5,7 @@ import io
 import qrcode
 import qrcode.image.svg
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.views import LoginView
 from django.db import connection
 from django.http import HttpResponse, JsonResponse
 from django.shortcuts import redirect, render
@@ -14,15 +15,29 @@ from django.views.decorators.http import require_GET
 from django_otp import login as otp_login
 from django_otp.plugins.otp_totp.models import TOTPDevice
 
+from . import roles
 from .utils import auditar
 
 
 def _destino_seguro(request):
-    """Evita redirecciones abiertas: solo se acepta un destino del mismo sitio."""
-    destino = request.POST.get("next") or request.GET.get("next") or "/dashboard/"
-    if url_has_allowed_host_and_scheme(destino, allowed_hosts={request.get_host()}, require_https=request.is_secure()):
+    """Evita redirecciones abiertas: solo se acepta un destino del mismo sitio.
+    Sin destino, cada persona llega a la primera pantalla de su rol."""
+    destino = request.POST.get("next") or request.GET.get("next") or ""
+    if destino and url_has_allowed_host_and_scheme(
+        destino, allowed_hosts={request.get_host()}, require_https=request.is_secure()
+    ):
         return destino
-    return "/dashboard/"
+    return roles.inicio_de(request.user)
+
+
+class Ingreso(LoginView):
+    """Acceso único del personal a la intranet. Tras la contraseña viene el segundo factor."""
+
+    template_name = "interno/ingreso.html"
+    redirect_authenticated_user = True
+
+    def get_default_redirect_url(self):
+        return roles.inicio_de(self.request.user)
 
 
 def _qr_svg(uri):
@@ -33,7 +48,7 @@ def _qr_svg(uri):
 
 
 @never_cache
-@login_required(login_url="/accounts/login/")
+@login_required(login_url="/ingresar/")
 def segundo_factor(request):
     usuario = request.user
     if not usuario.is_staff:

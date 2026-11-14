@@ -71,7 +71,7 @@ def _ultima_posicion():
     return sorted(flota, key=lambda c: (not c["alerta_ruptura_frio"], c["camion_id"]))
 
 
-@staff_member_required(login_url="/accounts/login/")
+@staff_member_required(login_url="/ingresar/")
 def torre_control(request):
     flota = _ultima_posicion()
     activas = (
@@ -97,7 +97,7 @@ def torre_control(request):
 
 
 @require_POST
-@staff_member_required(login_url="/accounts/login/")
+@staff_member_required(login_url="/ingresar/")
 def tomar_alerta(request, pk):
     alerta = get_object_or_404(AlertaFrio.objects.exclude(estado="CERRADA"), pk=pk)
     accion = request.POST.get("accion_tomada", "").strip()[:2000]

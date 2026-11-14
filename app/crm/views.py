@@ -18,7 +18,7 @@ def _oportunidades_visibles(usuario):
     return qs.filter(vendedor=usuario)
 
 
-@staff_member_required(login_url="/accounts/login/")
+@staff_member_required(login_url="/ingresar/")
 def kanban(request):
     visibles = _oportunidades_visibles(request.user)
     etapas = EtapaPipeline.objects.prefetch_related(
@@ -41,7 +41,7 @@ def kanban(request):
 
 
 @require_POST
-@staff_member_required(login_url="/accounts/login/")
+@staff_member_required(login_url="/ingresar/")
 def mover(request, pk):
     oportunidad = get_object_or_404(_oportunidades_visibles(request.user), pk=pk)  # 404 si no es suya
     etapa = get_object_or_404(EtapaPipeline, pk=request.POST.get("etapa"))

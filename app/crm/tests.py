@@ -1,6 +1,7 @@
 from unittest import mock
 
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import Group, Permission
 from django.test import TestCase, override_settings
 
 from crm import ia
@@ -49,6 +50,9 @@ class KanbanAutorizacionTests(TestCase):
         self.etapa2 = EtapaPipeline.objects.create(nombre="Propuesta", orden=2, probabilidad_pct=60)
         self.ana = User.objects.create_user("ana@cofrial.cl", is_staff=True)
         self.luis = User.objects.create_user("luis@cofrial.cl", is_staff=True)
+        ventas = Group.objects.create(name="Vendedores")
+        ventas.permissions.set(Permission.objects.filter(content_type__app_label="crm"))
+        ventas.user_set.add(self.ana, self.luis)
         prospecto = Prospecto.objects.create(razon_social="Clínica", nombre_contacto="X", origen="WEB")
         self.oportunidad = Oportunidad.objects.create(prospecto=prospecto, vendedor=self.ana, etapa=self.etapa1, titulo="Congelados")
 
@@ -68,4 +72,4 @@ class KanbanAutorizacionTests(TestCase):
     def test_cliente_externo_no_entra_al_crm(self):
         cliente = User.objects.create_user("compras@hospital.cl")
         self.client.force_login(cliente)
-        self.assertEqual(self.client.get("/crm/").status_code, 302)
+        self.assertEqual(self.client.get("/crm/").status_code, 404)  # la intranet no existe para un cliente

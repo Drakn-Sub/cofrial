@@ -1,0 +1,35 @@
+{% load static %}<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ingreso a la intranet | Cofrial</title>
+  <link rel="stylesheet" href="{% static 'cofrial/base.css' %}">
+  <link rel="stylesheet" href="{% static 'cofrial/intranet.css' %}">
+</head>
+<body>
+<div class="portal">
+  <div class="lado">
+    <div class="marca">Cofrial</div>
+    <p>Intranet de la cadena de frío. Un solo ingreso para todo el personal: después de tu clave, cada persona llega a la pantalla de su trabajo.</p>
+    <ul>
+      <li><b>Ventas</b> entra al embudo comercial.</li>
+      <li><b>Despacho</b> entra a la torre de control.</li>
+      <li><b>Jefatura</b> ve ventas y pedidos.</li>
+      <li><b>Administración</b> gestiona usuarios y auditoría.</li>
+    </ul>
+  </div>
+  <form class="formulario" method="post" novalidate>
+    {% csrf_token %}
+    <input type="hidden" name="next" value="{{ next }}">
+    <h1>Ingresa a la intranet</h1>
+    <p class="bajada">Usa tu correo de Cofrial. Luego te pediremos el código de tu celular.</p>
+    {% if form.errors %}<p class="error" role="alert">El correo o la contraseña no coinciden. Después de 5 intentos fallidos el acceso se bloquea por una hora.</p>{% endif %}
+    <div class="campo"><label for="id_username">Correo o usuario</label><input id="id_username" name="username" autocomplete="username" autofocus required value="{{ form.username.value|default:'' }}"></div>
+    <div class="campo"><label for="id_password">Contraseña</label><input id="id_password" name="password" type="password" autocomplete="current-password" required></div>
+    <button type="submit">Ingresar</button>
+    <p class="dato" style="margin-top:18px">¿Eres cliente? La tienda está en <a href="https://{{ host_tienda|default:'tienda.cofrial-temuco.duckdns.org' }}">otra dirección</a>.</p>
+  </form>
+</div>
+</body>
+</html>
