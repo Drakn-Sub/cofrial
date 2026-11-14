@@ -47,8 +47,11 @@
   (function () {
     var puntos = JSON.parse(document.getElementById("datos-flota").textContent);
     var mapa = L.map("mapa", { scrollWheelZoom: false }).setView([-38.74, -72.59], 9);
-    L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      maxZoom: 18, attribution: "&copy; OpenStreetMap"
+    // Teselas de CARTO (datos de OpenStreetMap): no exigen la cabecera Referer, que el sitio no envía
+    // a terceros por su política Referrer-Policy: same-origin.
+    L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
+      maxZoom: 19, subdomains: "abcd",
+      attribution: "&copy; OpenStreetMap &copy; CARTO"
     }).addTo(mapa);
     var grupo = [];
     puntos.forEach(function (p) {
