@@ -162,6 +162,7 @@ Script [`infra/scripts/pruebas_seguridad.sh`](../infra/scripts/pruebas_seguridad
 
 - **Red:** Security Groups encadenados (ALB → app → RDS), **NACL** en datos (solo 5432 desde app e IoT), subred de datos sin ruta a internet y endpoint de S3.
 - **Aplicación:**
+  - ingreso único de la intranet y **separación de roles**: ventas, despacho, jefatura y administrador ven y abren solo sus secciones; los intentos ajenos quedan en la auditoría;
   - segundo factor TOTP obligatorio para todo el personal interno;
   - Argon2 para las contraseñas;
   - bloqueo tras 5 intentos;
@@ -177,7 +178,7 @@ Script [`infra/scripts/pruebas_seguridad.sh`](../infra/scripts/pruebas_seguridad
   - pip-audit con SBOM CycloneDX (dependencias);
   - migraciones con el rol restringido;
   - prueba de privilegios;
-  - 23 pruebas automáticas;
+  - 31 pruebas automáticas;
   - `check --deploy`.
   - OWASP ZAP disponible bajo demanda (`zap.yml`).
 

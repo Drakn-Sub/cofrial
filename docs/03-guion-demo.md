@@ -69,7 +69,7 @@ En la consola de AWS:
    > "La tienda reconoce que es un cliente institucional y aplica la lista de precios de su convenio.
    > Si el convenio vence, vuelve al precio público."
 3. Agregar 2 productos al **carrito** → *Ir a la caja* → completar el pedido → mostrar el **número de orden**.
-4. En la pestaña del CRM → **Administración → Interacciones**: la primera fila es "Pedido web …" del hospital.
+4. En la pestaña del CRM → menú **Prospectos y mensajes → Interacciones**: la primera fila es "Pedido web …" del hospital.
    > "La tienda y el CRM comparten la base: el vendedor ve el pedido sin que nadie lo llame."
 5. Seguridad visible: en la pestaña sin sesión, ir a `tienda…/admin/` → **404**.
    > "Las rutas internas no existen en el sitio público."
@@ -78,7 +78,9 @@ En la consola de AWS:
 
 1. **Kanban:** mover una oportunidad de *Propuesta* a *Negociación*.
    > "Este vendedor solo ve sus oportunidades; si cambia el número en la URL para ver la de otro, recibe 404."
-2. **IA:** en **Administración → Interacciones → Añadir**: elegir el cliente "Hospital…", canal *Correo* y escribir:
+   >
+   > **Roles:** mostrar que el menú de la vendedora no tiene Torre de control. Escribir a mano `/ops/` en la dirección: el sistema la devuelve al CRM con un aviso y lo anota en la auditoría. En la pestaña de despacho el menú es otro.
+2. **IA:** en el menú **Prospectos y mensajes → Interacciones → Añadir**: elegir el cliente "Hospital…", canal *Correo* y escribir:
    *"El camión no llegó y necesitamos la leche antes del almuerzo de los pacientes"* → Guardar.
    Aparece **Despacho / Alta** sin que nadie la clasifique.
    > "Usamos Gemini en su plan gratuito. Antes de enviar el texto le quitamos RUT, correos y teléfonos, y
