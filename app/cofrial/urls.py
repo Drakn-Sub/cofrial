@@ -1,8 +1,10 @@
 from django.apps import apps
 from django.contrib import admin
-from django.urls import include, path
+from django.urls import include, path, re_path
 
 from cuentas import views as cuentas_views
+
+from .catalogo import CatalogoView, CategoriaView
 
 admin.site.site_header = "Cofrial · Administración"
 admin.site.site_title = "Cofrial"
@@ -13,5 +15,8 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("crm/", include("crm.urls")),
     path("ops/", include("logistica.urls")),
+    # Listado del catálogo desde PostgreSQL (reemplaza el de Haystack; ver cofrial/catalogo.py)
+    path("catalogue/", CatalogoView.as_view()),
+    re_path(r"^catalogue/category/(?P<category_slug>[\w-]+(/[\w-]+)*)_(?P<pk>\d+)/$", CategoriaView.as_view()),
     path("", include(apps.get_app_config("oscar").urls[0])),  # tienda django-oscar
 ]
