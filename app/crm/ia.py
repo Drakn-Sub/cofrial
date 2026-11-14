@@ -11,6 +11,7 @@ Si la IA falla o responde algo inesperado, la interacción queda "SIN_CLASIFICAR
 import json
 import logging
 import re
+import urllib.error
 import urllib.request
 
 from django.conf import settings
@@ -76,6 +77,10 @@ def clasificar(texto):
     prompt = f"{INSTRUCCIONES}\n<mensaje>{seudonimizar(texto)}</mensaje>"
     try:
         return interpretar(_llamar_api(prompt))
-    except Exception as error:  # red, cuota, formato: el CRM sigue funcionando
+    except urllib.error.HTTPError as error:  # cuota, modelo o clave: se registra el motivo, nunca la clave
+        motivo = error.read(300).decode("utf-8", "replace").replace("\n", " ")
+        logger.warning("Clasificación IA no disponible: HTTP %s %s", error.code, motivo)
+        return SIN_CLASIFICAR
+    except Exception as error:  # red, tiempo de espera, formato: el CRM sigue funcionando
         logger.warning("Clasificación IA no disponible: %s", type(error).__name__)
         return SIN_CLASIFICAR
