@@ -218,3 +218,9 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Proyecto Cofrial
+.env
+*.pem
+app/media/
+app/staticfiles/
