@@ -7,16 +7,19 @@ Los usuarios de demostración se crean SIN contraseña utilizable. Se les asigna
 este comando (la variable nunca se guarda en el repositorio).
 """
 import os
+import pathlib
 from datetime import date
 from decimal import Decimal
 
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group, Permission
+from django.core.files import File
 from django.core.management.base import BaseCommand
 from django.db import transaction
 from oscar.core.loading import get_model
 
 from crm.models import EtapaPipeline, Oportunidad, Prospecto
+from cuentas.demo.catalogo import PRODUCTOS
 from cuentas.models import Cliente, Comuna, ListaPrecio, Perfil, PrecioLista
 from logistica.models import Camion, CategoriaFrio
 
@@ -24,26 +27,26 @@ Category = get_model("catalogue", "Category")
 Product = get_model("catalogue", "Product")
 ProductClass = get_model("catalogue", "ProductClass")
 ProductCategory = get_model("catalogue", "ProductCategory")
+ProductImage = get_model("catalogue", "ProductImage")
 Partner = get_model("partner", "Partner")
 StockRecord = get_model("partner", "StockRecord")
 Country = get_model("address", "Country")
 User = get_user_model()
+IMAGENES = pathlib.Path(__file__).resolve().parents[2] / "demo" / "imagenes"
 
 COMUNAS = [
     (9101, "Temuco", True), (9112, "Padre Las Casas", True), (9108, "Lautaro", True),
     (9111, "Nueva Imperial", True), (9120, "Villarrica", True), (9115, "Pucón", False),
     (9201, "Angol", True), (9211, "Victoria", True),
 ]
-# (nombre, categoría, precio público CLP, precio convenio CLP, stock)
-PRODUCTOS = [
-    ("Posta negra de vacuno 1 kg", "Congelados", 8990, 7990, 420),
-    ("Pechuga de pollo deshuesada 1 kg", "Congelados", 5490, 4250, 900),
-    ("Merluza austral filete 1 kg", "Congelados", 9890, 8400, 260),
-    ("Hamburguesa de vacuno 10 un", "Congelados", 6490, 5300, 500),
-    ("Leche entera 1 L", "Refrigerados", 1190, 980, 1500),
-    ("Yogur natural 1 kg", "Refrigerados", 2890, 2390, 640),
-    ("Queso gauda laminado 500 g", "Refrigerados", 5290, 4490, 380),
-    ("Mantequilla con sal 250 g", "Refrigerados", 2590, 2150, 720),
+# Instituciones ficticias con convenio (RUT de demostración)
+INSTITUCIONES = [
+    ("76.111.222-3", "Hogar de Ancianos San José (demostración)", "Residencia de adultos mayores", 9112,
+     "compras@hogar-demo.cl", "Administradora"),
+    ("65.333.444-5", "Jardín Infantil Los Copihues (demostración)", "Educación parvularia", 9108,
+     "compras@jardin-demo.cl", "Directora"),
+    ("77.555.666-7", "Casino Universidad del Sur (demostración)", "Alimentación colectiva", 9101,
+     "compras@casino-demo.cl", "Jefe de cocina"),
 ]
 ETAPAS = [
     ("Prospecto", 1, 10, False), ("Contactado", 2, 20, False), ("Calificado", 3, 40, False),
@@ -77,15 +80,27 @@ class Command(BaseCommand):
         lista, _ = ListaPrecio.objects.get_or_create(
             nombre="Convenio Hospitales 2026", defaults={"vigente_desde": date(2026, 1, 1), "vigente_hasta": date(2026, 12, 31)}
         )
-        for i, (nombre, cat, publico, convenio, stock) in enumerate(PRODUCTOS, start=1):
+        for (nombre, cat, publico, convenio, stock, archivo, _icono, descripcion) in PRODUCTOS:
             producto, _ = Product.objects.get_or_create(
                 title=nombre, defaults={"product_class": clase, "structure": "standalone", "is_public": True}
             )
+            if producto.description != descripcion:
+                producto.description = descripcion
+                producto.save(update_fields=["description"])
+            imagen = IMAGENES / f"{archivo}.jpg"
+            if imagen.exists() and not producto.images.exists():
+                with imagen.open("rb") as f:  # se guarda en el almacenamiento por defecto (S3 privado en AWS)
+                    ProductImage.objects.create(
+                        product=producto, original=File(f, name=f"{archivo}.jpg"), caption=nombre, display_order=0
+                    )
             ProductCategory.objects.get_or_create(product=producto, category=categorias[cat])
+            # El SKU de un producto existente no cambia; los nuevos usan el nombre de su imagen
             StockRecord.objects.update_or_create(
                 product=producto,
                 partner=socio,
-                defaults={"partner_sku": f"CF-{i:04d}", "price": Decimal(publico), "price_currency": "CLP", "num_in_stock": stock},
+                defaults={"price": Decimal(publico), "price_currency": "CLP", "num_in_stock": stock},
+                create_defaults={"partner_sku": f"CF-{archivo.upper()}", "price": Decimal(publico),
+                                 "price_currency": "CLP", "num_in_stock": stock},
             )
             PrecioLista.objects.update_or_create(lista=lista, producto=producto, defaults={"precio_neto": Decimal(convenio)})
 
@@ -119,6 +134,17 @@ class Command(BaseCommand):
         comprador = usuario("compras@hospital-demo.cl", "Compras Hospital")
         Perfil.objects.update_or_create(usuario=comprador, defaults={"cliente": hospital, "cargo": "Jefa de abastecimiento"})
         usuario("cliente@demo.cl", "Cliente B2C")
+        lista_salud = lista
+        for rut, razon, giro, cut, correo, cargo in INSTITUCIONES:
+            cliente, _ = Cliente.objects.update_or_create(
+                rut=rut,
+                defaults={
+                    "tipo": "B2B", "razon_social": razon, "giro": giro, "comuna": Comuna.objects.get(codigo_cut=cut),
+                    "lista_precio": lista_salud, "condicion_pago": "30_DIAS", "consentimiento_datos": True,
+                },
+            )
+            Perfil.objects.update_or_create(usuario=usuario(correo, f"Compras {razon.split(' (')[0]}"),
+                                            defaults={"cliente": cliente, "cargo": cargo})
         vendedor = usuario("vendedor@cofrial.cl", "Vendedora Cofrial", staff=True, grupos=[vendedores])
         usuario("jefatura@cofrial.cl", "Jefatura Comercial", staff=True, grupos=[jefatura, vendedores])
         usuario("despacho@cofrial.cl", "Despachador Cofrial", staff=True, grupos=[despacho])
@@ -134,6 +160,14 @@ class Command(BaseCommand):
             ("Restaurante Lafken", "Proteínas premium para temporada", "Contactado", 1_200_000),
             ("Hospital de Villarrica", "Convenio 2027", "Calificado", 9_300_000),
             ("Casino Dreams Temuco", "Abastecimiento de cocina", "Prospecto", 3_100_000),
+            ("Hotel Frontera", "Desayunos buffet 2027", "Propuesta", 2_400_000),
+            ("Cesfam Pueblo Nuevo", "Leche y yogur para programa PNAC", "Calificado", 5_600_000),
+            ("Pastelería La Selva", "Mantequilla y berries por volumen", "Contactado", 850_000),
+            ("Colegio Bautista", "Casino escolar 2027", "Prospecto", 4_200_000),
+            ("Hogar de Ancianos San José", "Convenio adultos mayores", "Ganado", 3_900_000),
+            ("Jardín Infantil Los Copihues", "Colaciones refrigeradas", "Ganado", 1_750_000),
+            ("Restaurante El Fogón", "Carnes para parrilla", "Perdido", 980_000),
+            ("Cadena Súper Austral", "Reventa en góndola", "Negociación", 18_000_000),
         ]
         for razon, titulo, etapa, monto in oportunidades:
             prospecto, _ = Prospecto.objects.get_or_create(
@@ -155,7 +189,8 @@ class Command(BaseCommand):
             )
 
         self.stdout.write(self.style.SUCCESS(
-            "Datos de demostración cargados: 8 productos, 1 hospital con convenio, 5 oportunidades y 50 camiones."
+            f"Datos de demostración cargados: {len(PRODUCTOS)} productos con imagen, {len(INSTITUCIONES) + 1} instituciones "
+            f"con convenio, {Oportunidad.objects.count()} oportunidades y 50 camiones."
         ))
         if not clave:
             self.stdout.write("Los usuarios de demostración no tienen contraseña: asígnala con `manage.py changepassword <correo>`.")
