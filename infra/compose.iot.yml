@@ -1,0 +1,18 @@
+# Nodo IoT: el simulador no publica ningún puerto; solo sale hacia RDS con el rol iot_ingest.
+services:
+  simulador:
+    build: ../iot
+    image: cofrial-iot:local
+    env_file: /etc/cofrial/iot.env
+    environment:
+      DB_SSLMODE: verify-full
+      DB_SSLROOTCERT: /certs/rds-global-bundle.pem
+    volumes:
+      - /etc/pki/rds-global-bundle.pem:/certs/rds-global-bundle.pem:ro
+    restart: unless-stopped
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    mem_limit: 256m
+    cpus: 0.5
+    logging: { driver: json-file, options: { max-size: "10m", max-file: "3" } }
