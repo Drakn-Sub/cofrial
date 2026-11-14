@@ -1,0 +1,12 @@
+{% extends "admin/base.html" %}
+{% block title %}{% if subtitle %}{{ subtitle }} | {% endif %}{{ title }} | Cofrial{% endblock %}
+{% block branding %}
+<div id="site-name"><a href="{% url 'admin:index' %}">Cofrial · Administración</a></div>
+<nav style="display:flex;gap:16px;margin-left:24px;align-items:center;font-size:14px">
+  <a href="/crm/" style="color:#cfe3ec">CRM</a>
+  <a href="/ops/" style="color:#cfe3ec">Torre de control</a>
+  <a href="/dashboard/" style="color:#cfe3ec">Pedidos y catálogo</a>
+</nav>
+{% if user.is_anonymous %}{% include "admin/color_theme_toggle.html" %}{% endif %}
+{% endblock %}
+{% block nav-global %}{% endblock %}
