@@ -78,6 +78,7 @@ INSTALLED_APPS = [
     "django_otp.plugins.otp_totp",
     # Desarrollo propio
     "cuentas",
+    "crm",
 ]
 
 MIDDLEWARE = [
