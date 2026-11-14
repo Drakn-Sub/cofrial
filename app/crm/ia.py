@@ -5,7 +5,7 @@ El modelo se trata como un componente NO confiable (OWASP Top 10 para LLM):
 - LLM02 Divulgación de datos: se seudonimiza RUT, correo y teléfono antes de enviar.
 - LLM05 Salida insegura: solo se acepta una categoría y urgencia de lista cerrada.
 - LLM06 Agencia excesiva: la IA solo sugiere; no cambia pedidos ni envía mensajes.
-- LLM10 Consumo sin límite: texto truncado, tokens de salida limitados y 5 s de espera máxima.
+- LLM10 Consumo sin límite: texto truncado, tokens de salida limitados y espera máxima configurable (IA_TIMEOUT_SEG, 10 s).
 Si la IA falla o responde algo inesperado, la interacción queda "SIN_CLASIFICAR" (falla segura).
 """
 import json
@@ -58,7 +58,12 @@ def interpretar(texto_respuesta):
 def _llamar_api(prompt):
     cuerpo = {
         "contents": [{"parts": [{"text": prompt}]}],
-        "generationConfig": {"responseMimeType": "application/json", "maxOutputTokens": 128, "temperature": 0},
+        "generationConfig": {
+            "responseMimeType": "application/json",
+            "maxOutputTokens": 1024,
+            "temperature": 0,
+            "thinkingConfig": {"thinkingLevel": "low"},  # clasificar no requiere razonamiento largo
+        },
     }
     solicitud = urllib.request.Request(
         f"https://generativelanguage.googleapis.com/v1beta/models/{settings.IA_MODELO}:generateContent",
@@ -66,7 +71,7 @@ def _llamar_api(prompt):
         headers={"Content-Type": "application/json", "x-goog-api-key": settings.IA_API_KEY},
         method="POST",
     )
-    with urllib.request.urlopen(solicitud, timeout=5) as respuesta:  # nosec B310: URL fija HTTPS
+    with urllib.request.urlopen(solicitud, timeout=settings.IA_TIMEOUT_SEG) as respuesta:  # nosec B310: URL fija HTTPS
         datos = json.load(respuesta)
     return datos["candidates"][0]["content"]["parts"][0]["text"]
 
